@@ -1,0 +1,150 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Ellipse	em.py	/^from matplotlib.patches import Ellipse$/;"	i
+LogNorm	em2.py	/^from matplotlib.colors import LogNorm$/;"	i
+__all__	scipy_kde.py	/^__all__ = ['gaussian_kde']$/;"	v
+__call__	scipy_kde.py	/^    __call__ = evaluate$/;"	v	class:gaussian_kde
+__init__	scipy_kde.py	/^    def __init__(self, dataset, bw_method=None):$/;"	m	class:gaussian_kde
+_compute_covariance	scipy_kde.py	/^    def _compute_covariance(self):$/;"	m	class:gaussian_kde
+absolute_import	scipy_kde.py	/^from __future__ import division, print_function, absolute_import$/;"	i
+alpha	__init__.py	/^    alpha=eval(args['--alpha'])$/;"	v
+args	__init__.py	/^    args=docopt(__doc__, version='roki')$/;"	v
+arguments	naval_fate.py	/^    arguments = docopt(__doc__, version='Naval Fate 2.0')$/;"	v
+atleast_1d	scipy_kde.py	/^     ravel, power, atleast_1d, squeeze, sum, transpose$/;"	i
+atleast_2d	scipy_kde.py	/^     ravel, power, atleast_1d, squeeze, sum, transpose$/;"	i
+callable	scipy_kde.py	/^from scipy._lib.six import callable, string_types$/;"	i
+cluster	__init__.py	/^        cluster=int(sys.argv[3])$/;"	v
+cluster	__init__.py	/^    cluster=eval(args['--cluster'])$/;"	v
+covariance_factor	scipy_kde.py	/^    covariance_factor = scotts_factor$/;"	v	class:gaussian_kde
+data	em2.py	/^  data = flatten([np.random.normal(mu,sig,n) for mu,sig,n in par])$/;"	v
+datasets	em2.py	/^from sklearn import datasets$/;"	i
+division	em.py	/^from __future__ import division$/;"	i
+division	scipy_kde.py	/^from __future__ import division, print_function, absolute_import$/;"	i
+docopt	__init__.py	/^from docopt import docopt$/;"	i
+docopt	naval_fate.py	/^from docopt import docopt$/;"	i
+dot	scipy_kde.py	/^     ravel, power, atleast_1d, squeeze, sum, transpose$/;"	i
+e_step	em.py	/^def e_step(data, pars):$/;"	f
+eigsorted	em.py	/^def eigsorted(cov):$/;"	f
+em	em.py	/^def em(typ_nvariate='univariate'):$/;"	f
+end	__init__.py	/^        end=eval(args['<end>'])$/;"	v
+evaluate	scipy_kde.py	/^    def evaluate(self, points):$/;"	m	class:gaussian_kde
+exp	scipy_kde.py	/^     ravel, power, atleast_1d, squeeze, sum, transpose$/;"	i
+flatten	em.py	/^def flatten(lst):$/;"	f
+flatten	em2.py	/^def flatten(lst):$/;"	f
+gaiji	em2.py	/^  gaiji = list(map(lambda x:[x],data))$/;"	v
+gaussian	em.py	/^def gaussian(x, var):$/;"	f
+gaussian_kde	scipy_kde.py	/^class gaussian_kde(object):$/;"	c
+gaussians	em.py	/^def gaussians(x, par):$/;"	f
+gmm	em2.py	/^  gmm=mixture.GMM(n_components=3, covariance_type='full', n_iter=1000)$/;"	v
+integrate_box	scipy_kde.py	/^    def integrate_box(self, low_bounds, high_bounds, maxpts=None):$/;"	m	class:gaussian_kde
+integrate_box_1d	scipy_kde.py	/^    def integrate_box_1d(self, low, high):$/;"	m	class:gaussian_kde
+integrate_gaussian	scipy_kde.py	/^    def integrate_gaussian(self, mean, cov):$/;"	m	class:gaussian_kde
+integrate_kde	scipy_kde.py	/^    def integrate_kde(self, other):$/;"	m	class:gaussian_kde
+linalg	scipy_kde.py	/^from scipy import linalg, special$/;"	i
+loglikelihood	em.py	/^def loglikelihood(data, par):$/;"	f
+logpdf	scipy_kde.py	/^    def logpdf(self, x):$/;"	m	class:gaussian_kde
+logsumexp	scipy_kde.py	/^from scipy.special import logsumexp$/;"	i
+m	__init__.py	/^        m=eval(args['--m'])$/;"	v
+m_step	em.py	/^def m_step(data, gammas):$/;"	f
+main	em.py	/^def main():$/;"	f
+make_cov	em.py	/^def make_cov(x):$/;"	f
+make_data	em.py	/^def make_data(typ_nvariate):$/;"	f
+make_var	em.py	/^def make_var(gammas, data, mean):$/;"	f
+marg	__init__.py	/^        marg=sys.argv[2]$/;"	v
+marg	__init__.py	/^from marginal import marginal as marg$/;"	i
+matplotlib	em.py	/^import matplotlib.mlab as mlab$/;"	i
+matplotlib	em.py	/^import matplotlib.pyplot as plt$/;"	i
+matplotlib	em2.py	/^import matplotlib.pyplot as plt$/;"	i
+measure	__init__.py	/^from measuring import measure$/;"	i
+mixture	em2.py	/^from sklearn import mixture$/;"	i
+mlab	em.py	/^import matplotlib.mlab as mlab$/;"	i
+model	__init__.py	/^            model = score_model.CopulaScoreModel('gaussian', 'gumbel', 5)$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModel('gaussian', 'gumbel', i)$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModel('kde_scott', 'gumbel', 5)$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModel('kde_scott', 'gumbel', i)$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModel('kde_scott', 'gumbel', i,{'bw':'scott'})$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModel('kde_silverman', 'gumbel', 5)$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModel('kde_silverman', 'gumbel', i)$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModel('kde_silverman', 'gumbel', i,{'bw':'silverman'})$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModel(marg+'_'+par+'_'+m, 'gumbel', cluster,opt={'bw':par,'m':float(m)})$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModel(marg+'_'+par, 'gumbel', cluster,opt={'m':int(par)})$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModel(marg+'_'+v1+'-'+v2+'-'+v3, 'gumbel', cluster,opt={'0':float(v1),'1':float(v2),'2':float(v3)})#org$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModel(marg, 'gumbel', cluster)$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingKL('gaussian', 'gumbel', i, 2.5)$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingKL('kde_scott', 'gumbel', i, 2.5)$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingKL('kde_scott', 'gumbel', i, 2.5, {'bw':'scott'})$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingKL('kde_silverman', 'gumbel', i, 2.5)$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingKL('kde_silverman', 'gumbel', i, 2.5, {'bw':'silverman'})$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingKL(marg+'_'+par+'_'+m, 'gumbel', cluster,2.5,opt={'bw':par,'m':float(m)})$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingKL(marg+'_'+par, 'gumbel', cluster,2.5,opt={'m':int(par)})$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingKL(marg+'_'+v1+'-'+v2+'-'+v3, 'gumbel', cluster,2.5,opt={'0':float(v1),'1':float(v2),'2':float(v3)})#org$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingKL(marg, 'gumbel', cluster,2.5)$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingUsersPreference('gaussian','gumbel',5)$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingUsersPreference('gaussian','gumbel',i)$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingUsersPreference('kde_scott', 'gumbel', 5)$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingUsersPreference('kde_scott','gumbel',i,{'bw':'scott'})$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingUsersPreference('kde_silverman', 'gumbel',5)$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingUsersPreference('kde_silverman','gumbel',i,{'bw':'silverman'})$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingUsersPreference(marg+'_'+par+'_'+m, 'gumbel', cluster,opt={'bw':par,'m':float(m)})$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingUsersPreference(marg+'_'+par, 'gumbel', cluster,opt={'m':int(par)})$/;"	v
+model	__init__.py	/^            model = score_model.CopulaScoreModelDimensionReducedByUsingUsersPreference(marg, 'gumbel', cluster)$/;"	v
+model	__init__.py	/^        model = score_model.CopulaScoreModel('gaussian', 'gumbel', 2)$/;"	v
+model	__init__.py	/^        model = score_model.CopulaScoreModel('gaussian', 'gumbel', 5)$/;"	v
+model	__init__.py	/^        model = score_model.CopulaScoreModelDimensionReducedByUsingKL('em'+'_'+str(m), 'gumbel', cluster,alpha,opt={'0':m})$/;"	v
+model	__init__.py	/^        model = score_model.CopulaScoreModelDimensionReducedByUsingKL('em'+str(i), 'gumbel', 5, 2.5)$/;"	v
+model	__init__.py	/^        model = score_model.CopulaScoreModelDimensionReducedByUsingKL('em_m5', 'gumbel', 5, 2.5,opt={'m':5})#org$/;"	v
+model	__init__.py	/^        model = score_model.CopulaScoreModelDimensionReducedByUsingKL('gaussian', 'gumbel', 3, 2.5)$/;"	v
+model	__init__.py	/^        model = score_model.CopulaScoreModelDimensionReducedByUsingKL('gaussian', 'gumbel', 4, 2.5)$/;"	v
+model	__init__.py	/^        model = score_model.CopulaScoreModelDimensionReducedByUsingKL('gaussian', 'gumbel', 5, 2.5)$/;"	v
+model	__init__.py	/^        model = score_model.CopulaScoreModelDimensionReducedByUsingKL('gaussian', 'gumbel',5,2.5)$/;"	v
+model	__init__.py	/^        model = score_model.CopulaScoreModelDimensionReducedByUsingKL('kde_cv'+'_'+str(start)+'-'+str(end)+'-'+str(size), 'gumbel', cluster,alpha,opt={'0':start,'1':end,'2':size})#org$/;"	v
+model	__init__.py	/^        model = score_model.CopulaScoreModelDimensionReducedByUsingKL('kde_scott', 'gumbel', 5, 2.5, {'bw':'scott'})$/;"	v
+model	__init__.py	/^        model = score_model.CopulaScoreModelDimensionReducedByUsingKL('kde_scott', 'gumbel',5,2.5,{'bw':'scott'})$/;"	v
+model	__init__.py	/^        model = score_model.CopulaScoreModelDimensionReducedByUsingKL('kde_silverman', 'gumbel', 3, 2.5,{'bw':'silverman'})$/;"	v
+model	__init__.py	/^        model = score_model.CopulaScoreModelDimensionReducedByUsingKL('kde_silverman', 'gumbel', 5, 2.5,{'bw':'silverman'})#org$/;"	v
+model	__init__.py	/^        model = score_model.CopulaScoreModelDimensionReducedByUsingUsersPreference('gaussian', 'gumbel', 5)$/;"	v
+model	__init__.py	/^        model = score_model.LinearScoreModelUserPreference()$/;"	v
+model	__init__.py	/^        model = score_model.RBFSupportVectorMachineModel(c=0.01, gamma=8)$/;"	v
+multivariate_normal	scipy_kde.py	/^from numpy.random import randint, multivariate_normal$/;"	i
+mvn	scipy_kde.py	/^from . import mvn$/;"	i
+n_variate	em.py	/^def n_variate(x):$/;"	f
+newaxis	scipy_kde.py	/^     ravel, power, atleast_1d, squeeze, sum, transpose$/;"	i
+normalize	em.py	/^def normalize(lst):$/;"	f
+np	em.py	/^import numpy as np$/;"	i
+np	em2.py	/^import numpy as np$/;"	i
+np	scipy_kde.py	/^import numpy as np$/;"	i
+num	__init__.py	/^    num = (sys.argv[1])$/;"	v
+par	__init__.py	/^            par=sys.argv[4]$/;"	v
+par	em2.py	/^  par = [[2.0, 0.2, 300], [4.0, 0.4, 600], [6.0, 0.4, 100]]$/;"	v
+pdf	scipy_kde.py	/^    def pdf(self, x):$/;"	m	class:gaussian_kde
+pi	scipy_kde.py	/^     ravel, power, atleast_1d, squeeze, sum, transpose$/;"	i
+plt	em.py	/^import matplotlib.pyplot as plt$/;"	i
+plt	em2.py	/^import matplotlib.pyplot as plt$/;"	i
+power	scipy_kde.py	/^     ravel, power, atleast_1d, squeeze, sum, transpose$/;"	i
+print_function	em.py	/^from __future__ import print_function$/;"	i
+print_function	scipy_kde.py	/^from __future__ import division, print_function, absolute_import$/;"	i
+randint	scipy_kde.py	/^from numpy.random import randint, multivariate_normal$/;"	i
+ravel	scipy_kde.py	/^     ravel, power, atleast_1d, squeeze, sum, transpose$/;"	i
+resample	scipy_kde.py	/^    def resample(self, size=None):$/;"	m	class:gaussian_kde
+reshape	scipy_kde.py	/^     ravel, power, atleast_1d, squeeze, sum, transpose$/;"	i
+scale	em2.py	/^def scale(X):$/;"	f
+score_model	__init__.py	/^from scoring import models as score_model$/;"	i
+scotts_factor	scipy_kde.py	/^    def scotts_factor(self):$/;"	m	class:gaussian_kde
+set_bandwidth	scipy_kde.py	/^    def set_bandwidth(self, bw_method=None):$/;"	m	class:gaussian_kde
+silverman_factor	scipy_kde.py	/^    def silverman_factor(self):$/;"	m	class:gaussian_kde
+size	__init__.py	/^        size=eval(args['<size>'])$/;"	v
+special	scipy_kde.py	/^from scipy import linalg, special$/;"	i
+sqrt	scipy_kde.py	/^     ravel, power, atleast_1d, squeeze, sum, transpose$/;"	i
+squeeze	scipy_kde.py	/^     ravel, power, atleast_1d, squeeze, sum, transpose$/;"	i
+start	__init__.py	/^        start=eval(args['<start>'])$/;"	v
+string_types	scipy_kde.py	/^from scipy._lib.six import callable, string_types$/;"	i
+sum	scipy_kde.py	/^     ravel, power, atleast_1d, squeeze, sum, transpose$/;"	i
+sys	__init__.py	/^import sys$/;"	i
+transpose	em.py	/^def transpose(a):$/;"	f
+transpose	scipy_kde.py	/^     ravel, power, atleast_1d, squeeze, sum, transpose$/;"	i
+warnings	scipy_kde.py	/^import warnings$/;"	i
+zeros	scipy_kde.py	/^     ravel, power, atleast_1d, squeeze, sum, transpose$/;"	i

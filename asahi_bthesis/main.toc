@@ -1,0 +1,34 @@
+\contentsline {chapter}{{\advance \hangindent 1in {第1章}} \nobreakspace {} 序論}{1}
+\contentsline {chapter}{{\advance \hangindent 1in {第2章}} \nobreakspace {} 基本的事項}{3}
+\contentsline {section}{\numberline {2.1}情報推薦システム}{3}
+\contentsline {subsection}{\numberline {2.1.1}代表的な手法}{3}
+\contentsline {subsubsection}{協調フィルタリング}{3}
+\contentsline {subsubsection}{コンテンツベースフィルタリング}{5}
+\contentsline {subsection}{\numberline {2.1.2}評価指標}{6}
+\contentsline {section}{\numberline {2.2}コピュラ}{7}
+\contentsline {subsection}{\numberline {2.2.1}定義と基本的な性質}{7}
+\contentsline {subsection}{\numberline {2.2.2}代表的なコピュラ}{7}
+\contentsline {section}{\numberline {2.3}カーネル密度推定}{8}
+\contentsline {chapter}{{\advance \hangindent 1in {第3章}} \nobreakspace {} 関連研究}{9}
+\contentsline {section}{\numberline {3.1}コピュラによる適合度統合}{9}
+\contentsline {section}{\numberline {3.2}混合コピュラ}{9}
+\contentsline {section}{\numberline {3.3}関心度を考慮した特徴量統合式}{10}
+\contentsline {chapter}{{\advance \hangindent 1in {第4章}} \nobreakspace {} 提案手法}{12}
+\contentsline {section}{\numberline {4.1}離散値特徴量への数値マッピング}{13}
+\contentsline {section}{\numberline {4.2}カーネル密度推定を利用した複雑な分布への対応}{13}
+\contentsline {subsection}{\numberline {4.2.1}バンド幅の決定}{14}
+\contentsline {section}{\numberline {4.3}ノイズを除去した関心度式}{15}
+\contentsline {section}{\numberline {4.4}許容範囲フィルター}{16}
+\contentsline {chapter}{{\advance \hangindent 1in {第5章}} \nobreakspace {} 評価実験}{18}
+\contentsline {section}{\numberline {5.1}実験条件}{18}
+\contentsline {section}{\numberline {5.2}比較手法}{19}
+\contentsline {section}{\numberline {5.3}提案手法のパラメータ}{20}
+\contentsline {section}{\numberline {5.4}実験結果}{21}
+\contentsline {subsection}{\numberline {5.4.1}ROLE別離散値選択}{21}
+\contentsline {subsection}{\numberline {5.4.2}特異な分布}{22}
+\contentsline {subsection}{\numberline {5.4.3}旧データセットでの実験結果}{25}
+\contentsline {subsection}{\numberline {5.4.4}新データセットでの実験結果}{26}
+\contentsline {chapter}{{\advance \hangindent 1in {第6章}} \nobreakspace {} 結論}{34}
+\contentsline {chapter}{\bf 謝辞}{35}
+\contentsline {chapter}{\bf 参考文献}{35}
+\contentsline {chapter}{{\advance \hangindent 1in {付録 {A}}} \nobreakspace {} パラメータ候補の比較}{39}

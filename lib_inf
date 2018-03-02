@@ -1,0 +1,149 @@
+$R --version
+
+  R version 3.4.1 (2017-06-30) -- "Single Candle"
+  Copyright (C) 2017 The R Foundation for Statistical Computing
+  Platform: x86_64-apple-darwin15.6.0 (64-bit)
+
+  R is free software and comes with ABSOLUTELY NO WARRANTY.
+  You are welcome to redistribute it under the terms of the
+  GNU General Public License versions 2 or 3.
+  For more information about these matters see
+  http://www.gnu.org/licenses/.
+
+    パッケージ （ライブラリ ‘/Library/Frameworks/R.framework/Versions/3.4/Resources/library’ 中): 
+
+$Rscript -e 'library()'
+
+  ADGofTest               Anderson-Darling GoF test
+  base                    The R Base Package
+  bbmle                   Tools for General Maximum Likelihood Estimation
+  boot                    Bootstrap Functions (Originally by Angelo Canty
+                          for S)
+  chron                   Chronological Objects which can Handle Dates
+                          and Times
+  class                   Functions for Classification
+  cluster                 "Finding Groups in Data": Cluster Analysis
+                          Extended Rousseeuw et al.
+  codetools               Code Analysis Tools for R
+  colorspace              Color Space Manipulation
+  compiler                The R Compiler Package
+  copula                  Multivariate Dependence with Copulas
+  curl                    A Modern and Flexible Web Client for R
+  datasets                The R Datasets Package
+  digest                  Create Compact Hash Digests of R Objects
+  DistributionUtils       Distribution Utilities
+  doParallel              Foreach Parallel Adaptor for the 'parallel'
+                          Package
+  evaluate                Parsing and Evaluation Tools that Provide More
+                          Details than the Default
+  exactRankTests          Exact Distributions for Rank and Permutation
+                          Tests
+  expm                    Matrix Exponential, Log, 'etc'
+  FNN                     Fast Nearest Neighbor Search Algorithms and
+                          Applications
+  foreach                 Provides Foreach Looping Construct for R
+  foreign                 Read Data Stored by 'Minitab', 'S', 'SAS',
+                          'SPSS', 'Stata', 'Systat', 'Weka', 'dBase', ...
+  GeneralizedHyperbolic   The Generalized Hyperbolic Distribution
+  gmp                     Multiple Precision Arithmetic
+  graphics                The R Graphics Package
+  grDevices               The R Graphics Devices and Support for Colours
+                          and Fonts
+  grid                    The Grid Graphics Package
+  gridExtra               Miscellaneous Functions for "Grid" Graphics
+  gsl                     Wrapper for the Gnu Scientific Library
+  gtable                  Arrange 'Grobs' in Tables
+  highr                   Syntax Highlighting for R Source Code
+  htmltools               Tools for HTML
+  htmlwidgets             HTML Widgets for R
+  httpuv                  HTTP and WebSocket Server Library
+  iterators               Provides Iterator Construct for R
+  jsonlite                A Robust, High Performance JSON Parser and
+                          Generator for R
+  kdecopula               Kernel Smoothing for Bivariate Copula Densities
+  KernSmooth              Functions for Kernel Smoothing Supporting Wand
+                          & Jones (1995)
+  knitr                   A General-Purpose Package for Dynamic Report
+                          Generation in R
+  ks                      Kernel Smoothing
+  lattice                 Trellis Graphics for R
+  lcopula                 Liouville Copulas
+  locfit                  Local Regression, Likelihood and Density
+                          Estimation.
+  magrittr                A Forward-Pipe Operator for R
+  markdown                'Markdown' Rendering for R
+  MASS                    Support Functions and Datasets for Venables and
+                          Ripley's MASS
+  Matrix                  Sparse and Dense Matrix Classes and Methods
+  methods                 Formal Methods and Classes
+  mgcv                    Mixed GAM Computation Vehicle with GCV/AIC/REML
+                          Smoothness Estimation
+  mime                    Map Filenames to MIME Types
+  misc3d                  Miscellaneous 3D Plots
+  multicool               Permutations of Multisets in Cool-Lex Order
+  mvnormtest              Normality test for multivariate variables
+  mvtnorm                 Multivariate Normal and t Distributions
+  network                 Classes for Relational Data
+  nlme                    Linear and Nonlinear Mixed Effects Models
+  nloptr                  R interface to NLopt
+  nnet                    Feed-Forward Neural Networks and Multinomial
+                          Log-Linear Models
+  numDeriv                Accurate Numerical Derivatives
+  parallel                Support for Parallel computation in R
+  partitions              Additive Partitions of Integers
+  pcaPP                   Robust PCA by Projection Pursuit
+  polynom                 A Collection of Functions to Implement a Class
+                          for Univariate Polynomial Manipulations
+  pspline                 Penalized Smoothing Splines
+  qrng                    (Randomized) Quasi-Random Number Generators
+  quadprog                Functions to solve Quadratic Programming
+                          Problems.
+  quantmod                Quantitative Financial Modelling Framework
+  R6                      Classes with Reference Semantics
+  randtoolbox             Toolbox for Pseudo and Quasi Random Number
+                          Generation and RNG Tests
+  Rcpp                    Seamless R and C++ Integration
+  RcppArmadillo           'Rcpp' Integration for the 'Armadillo'
+                          Templated Linear Algebra Library
+  rgl                     3D Visualization Using OpenGL
+  Rmpfr                   R MPFR - Multiple Precision Floating-Point
+                          Reliable
+  rngWELL                 Toolbox for WELL Random Number Generators
+  rpart                   Recursive Partitioning and Regression Trees
+  Rsolnp                  General Non-Linear Optimization
+  rugarch                 Univariate GARCH Models
+  RUnit                   R Unit Test Framework
+  Runuran                 R Interface to the UNU.RAN Random Variate
+                          Generators
+  scatterplot3d           3D Scatter Plot
+  sfsmisc                 Utilities from 'Seminar fuer Statistik' ETH
+                          Zurich
+  shiny                   Web Application Framework for R
+  SkewHyperbolic          The Skew Hyperbolic Student t-Distribution
+  sourcetools             Tools for Reading, Tokenizing and Parsing R
+                          Code
+  spatial                 Functions for Kriging and Point Pattern
+                          Analysis
+  spd                     Semi Parametric Distribution
+  splines                 Regression Spline Functions and Classes
+  stabledist              Stable Distribution Functions
+  stats                   The R Stats Package
+  stats4                  Statistical Functions using S4 Classes
+  stringi                 Character String Processing Facilities
+  stringr                 Simple, Consistent Wrappers for Common String
+                          Operations
+  survival                Survival Analysis
+  tcltk                   Tcl/Tk Interface
+  tools                   Tools for Package Development
+  truncnorm               Truncated normal distribution
+  tseries                 Time Series Analysis and Computational Finance
+  TTR                     Technical Trading Rules
+  utils                   The R Utils Package
+  VGAM                    Vector Generalized Linear and Additive Models
+  VineCopula              Statistical Inference of Vine Copulas
+  xtable                  Export Tables to LaTeX or HTML
+  xts                     eXtensible Time Series
+  yaml                    Methods to Convert R Data to YAML and Back
+  zoo                     S3 Infrastructure for Regular and Irregular
+                          Time Series (Z's Ordered Observations)
+

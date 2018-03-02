@@ -1,0 +1,9 @@
+axis,percent
+meal,0
+charge,50
+distance,30
+service,10
+equipment,10
+location,0
+bath,0
+room,0

@@ -1,0 +1,102 @@
+\chapter{関連研究}
+\section{コピュラによる適合度統合}
+情報検索の分野では,複数の検索モデルで算出された適合度を統合することによって
+検索精度を向上させる研究がなされてきた\cite{IR-1}\cite{IR-2}\cite{IR-3}.
+Eickhoffら\cite{copulaInf}はコピュラを適合度統合に応用し,式(\ref{eq:eickhoff})を適合度統合式として提案した.
+\begin{equation}
+  \label{eq:eickhoff}
+     \centering
+  C_{prod}(U_{rel}) = C(U_{rel}) \prod_{i=1}^n u_{rel,i}
+\end{equation}
+$U_{rel}$は正解文書の適合度の累積分布の$n$次元ベクトルである.
+各適合度の尤度の積とコピュラを掛け合わせた式(\ref{eq:eickhoff})は評価実験を行った結果, いくつかのデータセットで統合式(\ref{eq:eickhoff})が線形結合よりも有効であることを示した.
+また, 様々なコピュラを用いて比較を行った結果, 情報検索のタスクにおいては$C_{Gumbel}$を用いることが適切であることを示した\cite{copulaEickhoff}.
+\section{混合コピュラ}
+Komatsudaら\cite{Komatsuda}は単一のコピュラでは多峰的な同時分布を表現できないことを指摘し,
+複数のコピュラの重み付け和で同時分布を表現する混合コピュラを用いた統合式(\ref{eq:c-mix})を提案した.
+\begin{comment}
+混合コピュラを構築する手順を以下に示す.
+\begin{enumerate}
+\item 適合文書のクラスタリングを行う.
+\item クラスタごとに周辺分布, コピュラのパラメータ推定を行う.
+\item 各クラスタのコピュラを足し合わせ混合コピュラを算出する.
+\end{enumerate}
+\end{comment}
+    以下に混合コピュラの式を示す.
+    \begin{equation}
+        \label{eq:c-mix}
+        \centering
+        C_{mix}(U_{rel})= \sum_{c=1}^{k} p_{c}C_{c}(U_{rel, c})
+    \end{equation}
+    ここで, $k$は文書集合のクラスタ数, $p_c$はクラスタ毎の重みで, $c$番目のクラスタに属する適合文書の割合である.
+  Komatsudaらは式 (\ref{eq:c-mix}) に加え, Eickhoffらの式(\ref{eq:eickhoff}) を混合コピュラ用に拡張した式
+\begin{equation}
+     \label{eq:c-mix-prod}
+     \centering
+      C_{mix-prod}(U)= C_{mix}(U_{rel})\prod_{i=1}^n \sum_{c=1}^{k} p_{c}u_{rel,c, i}
+\end{equation}
+を適合度統合式として提案した. $u_{rel,c, i}$は$c$番目のクラスタに属する適合文書のi番目の適合度の累積分布を表す.
+評価実験の結果, これらの統合式はEickhoffらの式よりも精度が高く, $C_{mix}$よりも$C_{mix-prod}$の方が精度が高いことが示された.
+
+\section{関心度を考慮した特徴量統合式}
+情報検索分野での適合度統合手法を情報推薦分野に適用する場合,
+適合文書を適合アイテム,各適合度をアイテムの各特徴量と読み替えることで,
+コピュラによる適合度統合式を情報推薦の嗜好モデル構築に適用することができる.\par
+文書の適合度はユーザに依存せず客観的に表現され,高精度検索に貢献することが検証されている統計量により定義される.
+これに対して,ユーザの嗜好はユーザ依存であり,全ての特徴量を対称に扱うのは不適切である.
+よって,適合度統合式を嗜好モデル構築に適用する場合,ユーザがもつ各特徴量への関心度を考慮する必要がある.\par
+鈴木ら\cite{Suzuki}はKL距離\cite{kl-divergence}を用いてユーザの$i$番目の特徴量に対する関心度$Att_{i}$を式(\ref{eq:Att})のように定義した.
+\begin{eqnarray}
+     \label{eq:Att}
+     {Att}_{i} &=& \log_{1p}(D_{\mathrm{KL}}(ALL_i\|User_i)) \nonumber \\
+               &=& \log_{1p}(\int_{-\infty}^{\infty} pdf_{all}(x_{i}) \log \frac{pdf_{all}(x_{i})}{pdf_{user}(x_{i})} \; dx)
+\end{eqnarray}
+KL距離は分布差を示す指標であり,$D_{KL}(ALL_i\|User_i)$はユーザが関心を示したアイテムと全アイテムの分布差を表している.\par
+鈴木らは関心度$Att$を用いて,関心度集合$S_{Att}$から関心度が高い特徴量のみを抽出した$S_{emp}$と,$S_{Att}$から関心度が低い特徴量を除いた$S_{rdc}$を式(\ref{eq:set_emp})と式(\ref{eq:set_rdc})のように定義した.
+ここでは$S_{Att}$に関して平均と分散を推定し,それらを用いて検出した外れ値を特徴量抽出に利用している.\par
+外れ値の検出に必要な平均と分散は外れ値の影響が小さい$robust$な方法\cite{robust-stat}でメジアン$Med$と$MADN$(式(\ref{eq:madn}))として推定する.
+鈴木らの評価実験では$cns_a=2.5$で最高の結果を示した.
+
+\begin{eqnarray}
+    \label{eq:mad}
+    \centering
+    MAD(S_{Att}) &=& Med(\{|Att_i - Med(S_{Att})|\}) \\
+    \label{eq:madn}
+    \centering
+    MADN(S_{Att}) &=& \frac{MAD(S_{Att})}{0.675}
+\end{eqnarray}
+
+\begin{equation}
+\label{eq:set_emp}
+ \centering
+S_{emp}=\{i|Med(S_{Att})+cns_a\cdot MADN(S_{Att})\leq Att_i\}
+\end{equation}
+
+\begin{equation}
+\label{eq:set_rdc}
+S_{rdc}=\{i|Att_i \leq Med(S_{Att})-cns_a\cdot MADN(S_{Att})\}
+\end{equation}
+
+\begin{comment}
+\begin{flalign}
+\label{eq:set_emp}
+ \centering
+&S_{emp}=\{i|Med(S_{Att})+cns_a\cdot MADN(S_{Att})\leq Att_i\}& \\
+\label{eq:set_rdc}
+   \centering
+&S_{rdc}=\{i|Att_i \leq Med(S_{Att})-cns_a\cdot MADN(S_{Att})\}&
+\end{flalign}
+\end{comment}
+鈴木らは,$S_{rdc}$と$S_{emp}$と,小松田らの混合コピュラ式(\ref{eq:c-mix-prod})から関心度を反映させた統合式(\ref{eq:kl-emp-prod})を提案した.
+統合式$C_{kl-emp-rod}$は特定の評価指標について既存の統合式と比較して最高の結果を示した.
+
+\begin{equation}
+    \label{eq:kl-emp}
+    \centering
+    C_{kl-emp}(U_{rdc}) =  C_{mix}(U_{rdc}) \prod_{i \in S_{emp}} \sum_{c=1}^{k} p_{c}u_{rel,c, i}
+\end{equation}
+\begin{equation}
+    \label{eq:kl-emp-prod}
+    \centering
+    C_{kl-emp-prod}(U_{rdc}) = \begin{cases} C_{mix-prod}(U_{rdc}) & \text{if}\; S_{emp} =	 \emptyset\\ C_{kl-emp}(U_{rdc}) & \text{otherwise}\;   \end{cases}
+\end{equation}

@@ -1,0 +1,74 @@
+ソースコード内(/src/)の説明
+基本的にpythonで書かれていて、コピュラのコアの部分だけrのライブラリを使っています
+
+/copula　#コピュラに関するモジュール
+    copula.R  # 実装
+    copula.py # Rで実装されたコピュラを呼び出すラッパークラス
+
+/marginal
+   marginal.py # 周辺分布の抽象クラスと実装クラス（正規分布など）
+   quantizer.py # 使用していない
+
+/scoring
+   models.py # スコアリングモデルの抽象クラスとその実装クラス
+   legacy.py # 使用していない（実験で試したスコアモデル）
+
+/measuring/measure.py #モデルの評価を行う関数群
+
+/util
+    util.py # util関数群
+
+__init__.py # main　（スコアモデルの宣言と評価を実行)
+
+/svm_rank # rankingSVMのための実行ファイルが入ったディレクトリでコードを変更する必要はない
+
+
+
+#環境構築
+python
+１．ここ(https://www.continuum.io/downloads)からOSに合わせてダウンロードしてください。
+２. 基本的に殆どのモジュールがデフォルトでanacondaに同梱されていますが、
+    いくつかのモジュールは手動でpip installする必要があります。
+    以下のコマンドを入力してください。
+    pip install pyper
+    pip install docopt
+
+    ※手動で入れたモジュールはこれだけだったと思いますが、もし実行して動かないようでしたら、
+    　申し訳ないですが、エラーが出たモジュール名で pip install ’モジュール名’してみてください。
+
+R
+1. rのダウンロード https://www.r-project.org/
+2. CRANからコピュラのライブラリをダウンロード　https://cran.r-project.org/web/packages/copula/index.html
+
+
+svmRankのビルド
+./svmRank下で
+    make
+を実行
+
+#実行方法
+src/下で python __init__.py+引数リストで実行
+#引数リスト
+提案手法
+鈴木らの手法
+LIN
+SVM
+
+#train_id...４分交差検証用のデータID.
+training,testの振り分けで結果がかわるためIDを付与.
+#cluster_id...クラスタリングID.
+クラスタリングは実験ごとにランダムな結果になる.再現性をとるためIDを付与.既存のIDを指定すれば，そのクラスタリング結果を利用できるため同じ結果になる.
+
+#ディレクトリ
+/disc(離散値データセット+結果)
+/cont(連続値でーたセット+結果)
+
+
+/disc/train_id,
+/train_id 
+../INPUT_TYPE/{K_ID,ALL_ITEMS}
+/K_ID/{USER_ID,CLUSTER_ID}
+/USER_ID/user*.json,user_{true,falese}.json,ppl_param
+/CLUSTER_ID/{MODEL_NAME,TEX,COMPARE,PLOT}
+/MODEL_NAME/{PDF,CDF,PARAM,...}/{all,user_id_kth}.txt
+all/score_type-rank_*.txt

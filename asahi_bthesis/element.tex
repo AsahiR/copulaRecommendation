@@ -1,0 +1,222 @@
+\chapter{基本的事項}
+\section{情報推薦システム}
+情報推薦システムとは,ユーザの過去の行動履歴からユーザの嗜好を汲み取り,ユーザにとって有用と思われる情報や商品などを提示するシステムである.
+推薦対象の商品や情報などをアイテムと呼ぶ.動画配信サービスなどで目にすることが多い「あなたにおすすめの動画」と提示されるリストは,情報推薦システムの出力の1例である.このようなシステムに用いられるアルゴリズムは,協調フィルタリング\cite{user-based-collaborative-filtering}\cite{item-based-collaborative-filtering}とコンテンツベースフィルタリング\cite{content-based-filtering}に大別される.
+\subsection{代表的な手法}
+\subsubsection{協調フィルタリング}
+  協調フィルタリングは推薦対象ユーザがアイテムにつけた評価値を利用して, 推薦対象ユーザまたはアイテムと似た要素からなる近傍を特定する.その後, 近傍を利用してアイテムを推薦する.\cite{rec_text}\par
+\begin{comment}
+大規模なサービスで用いられることの多いアイテムベースフィルタリングについて紹介する.\par
+\end{comment}
+表\ref{tab:user-table} のように各ユーザが各アイテムに評価値を与えていたとき, ユーザ1のアイテム5の評価値を協調フィルタリングを用いて予測することを考える.
+協調フィルタリングは,近傍形成と評価値予測の方法によりユーザベースの手法\cite{user-based-collaborative-filtering}とアイテムベースの手法\cite{item-based-collaborative-filtering}に大別される.
+近傍とはある要素に似たものを指す.\par
+ユーザベースの場合,ユーザ間の類似度を算出し,推薦対象のユーザとの類似度が高いユーザから形成した近傍の各ユーザについて,式\eqref{eq:user_base}のように推薦対象アイテムの評価値と推薦対象ユーザとの類似度の重みつけ和により,評価値を予測する.
+近傍形成にはユーザ$a$とユーザ$b$の類似度にピアソンの相関係数(式\eqref{eq:piason})を用いて,推薦対象ユーザと正の相関をもつユーザから形成する方法がある.
+\\
+\begin{equation}
+\label{eq:piason}
+sim_u(a,b)=\frac{\sum_{p\in P}^{}{(r_{a,p}-\overline{r_a})(r_{b,p}-\overline{r_b}})}{\sqrt{\sum_{p\in P}^{}{(r_{a,p}-\overline{r_a})^2}} \sqrt{\sum_{p\in P}^{}{(r_{b,p}-\overline{r_b})^2}}}
+\end{equation}
+$\overline{r_a}$はユーザ$a$の評価値の平均を表し,Pはアイテム集合である.
+%sim_{u}=\frac{\sum_{p}^{n}{(r_{a,p}-r_a)(r_{b,p}-r_b)}}{\sqrt{\sum_{p\inP}{(r{a,p}-r_{a})^2}}\sqrt{\sum_{p}^{n}{(r_{b,p}-r_b)^2}}}
+ユーザ1との相関係数はユーザ2が0.85,ユーザ3が070,ユーザ4が0.00,ユーザ5が-0.79であるため,ユーザ1の近傍ユーザはユーザ2とユーザ3である.\\
+次に,この近傍ユーザ2と3の評価履歴からユーザ1のアイテム5の予測評価値$pred_u(1,5)$を式\eqref{eq:user_base}のようにして求める.
+\begin{equation}
+  \label{eq:user_base}
+  pred_u(a,p)=\overline{r_a}+\frac{\sum_{b\in N_u}{sim_u(a,b)(r_{b,p}-\overline{r_b})}}{\sum_{b\in N_u}{sim_u(a,b)}}
+\end{equation}
+$N_u$は推薦対象ユーザの近傍ユーザの集合である.よってユーザ1のアイテム5の予測評価値は$4+\frac{1}{(0.85+0.7)}(0.85(3-2.4)+0.7(5-3.8))=4.87$となる
+
+\begin{table}[ht]
+ \caption{ユーザの評価値行列}
+ \label{tab:user-table}
+ \begin{center}
+  \begin{tabular}{|lccccc|} \hline
+    & アイテム1 & アイテム2 & アイテム3 & アイテム4 & アイテム5\\ \hline
+    ユーザ1	& 5 & 3 & 4 & 4 & ?\\
+    ユーザ2	& 3 & 1 & 2 & 3 & 3 \\
+    ユーザ3	& 4 & 3 & 4 & 3 & 5\\
+    ユーザ4 & 3 & 3 & 1 & 5 & 4\\
+    ユーザ5 & 1 & 5 & 5 & 2 & 1\\ \hline
+  \end{tabular}
+ \end{center}
+\end{table}
+アイテムベースの場合,アイテム間で類似度を算出し,推薦対象アイテムの類似度が高いものから近傍を形成する.
+アイテム間の類似度には式\eqref{eq:cos}のような,アイテムベクトル間のコサイン類似度などが用いられる.
+\begin{equation}
+    \label{eq:cos}
+    sim_i( \vec{a}, \vec{b}) = \frac{  \vec{a} \cdot \vec{b}}{|\vec{a}| \times |\vec{b}|}
+\end{equation}
+
+\begin{comment}
+ユーザ$u$の未評価のアイテム$p$に対する評価値は, 以下のアイテム$p$とユーザが評価済みのアイテム$i$との類似度の重み付け和の式$pred_i(u, p)$で予測できる.
+$r_{u,i}$はユーザ$u$のアイテム$i$についての評価値である.
+\begin{equation}
+    \label{eq:itembase}
+    pred_i(u, p) = \frac{\sum_{i\in {N_i}}{sim_i(p, i)r_{u,i}}}{\sum_{i\in N_i}{sim_i(p, i)}}
+\end{equation}
+\end{comment}
+近傍形成後は,ユーザベースと同様に近傍$N_{i}$を対象に式\eqref{eq:itembase}のようにして,推薦対象アイテムの近傍$N_{i}$の各アイテムについて推薦対象ユーザによる評価値と推薦対象アイテムとの類似度の重みつけ和により未評価アイテムの予測評価値$pred_i(1,5)$を算出する.
+\begin{equation}
+    \label{eq:itembase}
+    pred_i(a, p) = \frac{\sum_{b\in N_i}{sim(b,p)r_{a,b}}}{\sum_{b \in N_i}{sim(b,p)}}
+\end{equation}\par
+実際には, 全ての未評価アイテムの評価値を計算し, 予測された評価値の高い順番にアイテムを提示することで推薦を行う.
+このように協調フィルタリングではユーザがつけた評価値のみを用いて推薦を行うため, 推薦対象アイテムについてのドメイン知識は必要ない.
+また, 他のユーザの評価値を利用するため, 推薦対象ユーザにとって意外性のあるアイテムの推薦を行うことが可能となる.
+しかし, 大規模なユーザ数とアイテムへの評価履歴がない場合は有効な推薦を行うことができず, このような問題はコールドスタート問題として知られている.
+
+\subsubsection{コンテンツベースフィルタリング}
+コンテンツベースフィルタリングは, アイテムが持つ性質やユーザ個人の好みを利用して推薦を行う手法である.
+ユーザの好みを表す情報はユーザプロファイルとよばれる.
+
+アイテムが持つ性質は推薦システム内では特徴パラメータとして数値で表される\cite{recOku}. アイテムの性質に応じて, 以下のような型で表現される.
+\begin{itemize}
+\item {\bf 連続値型}\par
+   ［0, 1］のような,連続値により表現できる.
+    \par
+    例: 価格や駅から店までの距離など
+\item {\bf 二値型}\par
+    二値\{0, 1\}で,ある属性を満たすかどうか表現する.
+    \par
+    例: 「期間限定」や「特典あり」など
+\item {\bf カテゴリ型}\par
+    三次元以上のパラメータを持ち, 該当する子パラメータのみ1とし, それ以外を0として表現する.
+    \par
+    例: 色\{ 青（1, 0, 0）赤（0, 1, 0）, 黄（0, 0, 1） \}
+\end{itemize}
+コンテンツベースフィルタリングでは各特徴パラメータを入力として, ユーザプロファイルを用いてスコアを算出しランキング付けを行う.
+スコアの算出方法は, ユーザプロファイルの形態によるが, 各特徴パラメータの重み付け和や, ユーザが好むアイテムとの類似度を計算することで算出できる.
+
+コンテンツベースフィルタリングを用いる場合,
+アイテムがどのような特徴パラメータを持っているかをシステムが知っている必要があるが,
+協調フィルタリングと異なり他のユーザに依存しないため, 推薦システムの利用者が少数の場合でも推薦を行うことができる.
+\subsection{評価指標}
+推薦システムの性能を評価するための尺度について述べる.
+推薦アイテムのうち, 正しく推薦されたアイテムを適合アイテム, そうでないものを不適合アイテムと呼ぶ.
+$P@k$は推薦結果上位$k$件のうち, 適合アイテムが占める割合を示す指標. $k$件中に含まれる適合アイテムの数を$h$とすると, $P@k$は以下の式で表される.
+\begin{equation}
+    \label{eq:pr}
+    P@k = \frac{h}{k}
+\end{equation}
+$nDCG@k$は, 上位$k$件の推薦結果のランキング付けの妥当性を示す指標である.
+推薦結果の上位に適合度が高いアイテムが多いほど値が大きくなる指標$DCG@k$を, $DCG@k$の理想値$iDCG@k$で割って正規化した値が$nDCG@k$である.
+$iDCG$は推薦結果のアイテムを適合度順にソートしたときの$DCG$を計算することで求めることができる.
+ \begin{equation}
+   \centering
+   \label{eq:dcg}
+   \mathrm{DCG}@k = \sum_{i=1}^k\frac{2^{rel_i}-1}{\log_2(i+1)}
+ \end{equation}
+ \begin{equation}
+   \centering
+   \label{eq:nDCG}
+   \mathrm{nDCG}@k = \frac{\mathrm{DCG}@k}{\mathrm{iDCG}@k}
+ \end{equation}
+ ここで, $rel_i$は上位$i$番目アイテムの適合度である. 適合ならば1, 不適合ならば0で表現される.
+
+ 再現率$Recall_k$は推薦結果の網羅性を示す指標である. 上位$k$件中に含まれる適合アイテムを$h$, 全適合アイテムの数を$a$とすると,
+ 上位$k$件を取得した際の$Recall_k$は以下の式で表される.
+\begin{equation}
+    \label{eq:recall}
+	Recall_{k} = \frac{h}{a}
+\end{equation}
+
+ iP@$i$は, 再現率が$i$の時点での推薦精度を示しており, 再現率が$i$以上における精度の最大値で表される.
+ \begin{equation}
+   \centering
+   \label{eq:ip}
+   \mathrm{iP}@i = \max_{k} \{ P@k | Recall_k \geq i \}
+ \end{equation}
+
+\newpage
+\section{コピュラ}
+コピュラとは,多次元の確率変数ベクトルがあるとき1次元の各確率変数の累積分布関数を入力に,多次元の同時分布を出力とする関数のことである.
+\subsection{定義と基本的な性質}
+$k$次元の確率変数ベクトル$X = (x_1,x_2,...,x_k)$を考える.
+それぞれの累積分布関数を$cdf_k(x) = prb[X_k \leq x]$とすると,
+確率変数ベクトル$X$を以下のように$k$次元単位立方空間$[0,1]^k$に写像できる.
+\begin{align*}
+    U = (u_1,u_2,...,u_k)
+      = (cdf_1(x_1),cdf_2(x_2),...,cdf_k(x_k))
+\end{align*}
+このとき$k$次元同時累積分布$cdf(x_1, x_2, ..., x_n)$はある関数$C$を用いて,
+\begin{align*}
+  \begin{split}
+  cdf(x_1, x_2, ..., x_n) &= C(cdf_1(x_1),cdf_2(x_2),...,cdf_k(x_k)) \\
+  &= C(U)
+  \end{split}
+\end{align*}
+と表せることがスクラーの定理 \cite{sklar}で知られている. この関数$C$がコピュラであり, 周辺分布間の依存関係を表す.
+同時分布を構築する際, 各周辺分布のパラメータとコピュラのパラメータは個別に推定することができるため,
+柔軟なモデリングが行うことができ, モデルの解釈も容易となる.\par
+以下にコピュラが持つ性質を示す.
+\par
+
+\begin{itemize}
+ \item
+   $C(u_1,u_2,...,u_k)$は単調増加関数である.
+ \item
+    $Uの$要素のうち, ある一つの要素$u_i(i=1,...,k)$以外の要素が全て1ならば, $C$の値は$u_i$と一致する.
+    すなわち,
+   \begin{center}
+   $C(1,...,1,u_i,1,...,1) = u_i$
+   \end{center}
+ \item
+    $U$の要素のうち, 少なくとも一つの要素が0ならば, $C$の値は0となる.
+    すなわち,
+   \begin{center}
+   $C(u_1,...,u_{i-1},0,u_{i+1},...,u_k) = 0$
+   \end{center}
+\end{itemize}
+\par
+\subsection{代表的なコピュラ}
+コピュラのモデルには様々なものがあり,分布の特性に応じたモデルを選択するのが望ましい.
+代表的なモデルとして式(\ref{eq:gumbel})$\sim$式(\ref{eq:clayton})のようなものがある.
+$\theta$は依存関係の度合いを表すパラメータであり,$\theta$が大きいほど変数間の依存関係が強いことを意味する.
+\begin{itemize}
+ \item {\bf $Gumbel$コピュラ}
+   \par
+$C_{Gubmel}$は$u_i$が1付近で相関関係が高くなる.
+    \begin{equation}
+    \label{eq:gumbel}
+     \centering
+    C_{Gumbel}(U) = \exp(-(\sum_{i=1}^{k}(-log(u_i))^{\theta})^{\frac{1}{\theta}})
+\end{equation}
+\item {\bf $Frank$コピュラ}
+\par$C_{Frank}$は$u_i$が0.5付近で相関関係が高くなる.
+\begin{equation}
+    \label{eq:frank}
+    \centering
+    C_{Frank}(U) = \frac{1}{\theta}log(1 + \frac{\prod_{i=1}^{k}(\exp(-\theta\ u_i) - 1)}{\exp((-\theta)-1)^{k-1}})
+\end{equation}
+
+ \item {\bf $Clayton$コピュラ}
+\par$C_{Clayton}$は$u_i$が0付近で相関関係が高くなる.
+\begin{equation}
+    \label{eq:clayton}
+    \centering
+    C_{Clayton}(U) = (1 + \theta(\sum_{i=1}^{k}\frac{1}{\theta}(u_i^{-\theta} - 1)))^{\frac{-1}{\theta}}
+\end{equation}
+\end{itemize}
+
+\section{カーネル密度推定}
+カーネル密度推定\cite{Silverman}は,確率変数の確率密度関数を推定するノンパラメトリック手法の一つである.
+$x_1,x_2,..x_n$を確率密度関数$pdf$をもつ独立同時分布からの標本とする.カーネル関数$K$,バンド幅$h$のカーネル密度推定量$\hat{pdf}$は式(\ref{eq:kde})である.
+\begin{equation}
+\label{eq:kde}
+\hat{pdf_{h}}(x)=\frac{1}{nh}\sum_{i=1}^n K(\frac{x-x_i}{h})
+\end{equation}
+\label{sbsc:related_bw}
+%カーネル密度推定の推定にはバンド幅$h$の影響を考慮する必要がある.
+バンド幅$h$の選択は,カーネル密度推定の結果に影響する.
+バンド幅に採用される値の中で,代表的なものには以下の$h_{1}$,$h_{2}$がある.\cite{Scott}\cite{Silverman}
+\begin{equation*}
+\label{eq:scott}
+h_{1}=\left(\frac{1}{n}{\sigma}^5\right)^{\frac{1}{5}}
+\end{equation*}
+
+\begin{equation*}
+\label{eq:silverman}
+h_{2}=\left(\frac{4{\sigma}^5}{3n}\right)^\frac{1}{5}
+\end{equation*}

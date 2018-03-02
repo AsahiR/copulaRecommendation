@@ -1,0 +1,45 @@
+#ソースコードのリファクタリングが未完成です.進捗報告がてら現在の成果物をアップロードしますが動作確認が済んでいない上に結果の可視化まで手が回っていません.3/7までに完成版をアップロードします.
+
+#ディレクトリ構成
+./{asahi_bthesis,abstract,src,lib_inf}
+/lib
+Rのライブラリ情報.
+$R --versionと$Rscript -e 'library()'の結果
+/asahi_bthesis
+卒論のソース+pdf
+/abstract
+300字概要+概要図
+/src
+ソースコード.未完成.3/7までに完成版をアップします.
+
+#環境構築
+---python--------
+$pyenv install anaconda_xxx(version xxxをインストール)
+$python --version(私の)
+>Python 3.6.0 :: Anaconda 4.3.1 (x86_64))
+$pip install module_xxx(足りないmoduleをインストール)
+手動で追加したのは以下
+docopt,pyper
+
+----R------
+1. rのダウンロード https://www.r-project.org/
+2. CRANからコピュラのライブラリをダウンロード　https://cran.r-project.org/web/packages/copula/index.html
+$Rscript -e 'l
+
+---svm----
+svm_rankのビルド
+./src/svm_rank下で
+    make
+を実行
+
+#実行方法
+python __init__.py 引数リスト
+以降の引き継ぎ作業は 2 月中に終わらせること
+下記のデータを全てファイルサーバの該当ディレクトリ(share/manuscripts/(卒業年)/thesis) にアップロードする．
+学士論文・修士論文・博士論文の原稿データ
+研究で使用・作成したソースコードとそのマニュアル (詳細なコメントが難しい場合でも，各ファイルの役割を記載した README は作成すること)
+実験データ
+卒論・修論・博論発表スライド
+学会発表スライド全て
+300 字概要と概要図を作成する．概要の中には論文のタイトルも入れる．卒業生の研究概要を参考にする．事前に教員にチェックを依頼する．
+計算機の手続きついて教員に相談する (そのまま内部進学する学生は除く)．

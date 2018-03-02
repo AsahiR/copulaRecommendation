@@ -1,0 +1,73 @@
+\documentclass[a4j,12pt,onecolumn,oneside,final]{jreport}
+
+%\usepackage{gthesis}
+\usepackage{gthesis_myown}
+
+\usepackage{amsmath,amsthm,amssymb,ascmac}
+\usepackage{fancybox}
+\usepackage{slashbox}
+%\usepackage[dviout]{color,graphics}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{psfrag}
+%\usepackage{upgreek}
+\usepackage{bm}
+\usepackage{wrapfig}
+\usepackage{comment}
+\usepackage{url}
+\usepackage{here}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{my-macros}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\年度{平成29年度}
+%\提出年月{平成29年7月}
+\提出年月{平成30年2月}
+
+\題名{離散値特徴量や特異な嗜好ケースを\\考慮したコピュラを用いた推薦システム}
+\梗概題名{離散値特徴量や特異な嗜好ケースを\\考慮したコピュラを用いた推薦システム}
+%\題名{楽に卒業する方法に関する基礎的研究\\
+%			--- そもそもそれは可能か？ ---}
+%\梗概題名{楽に卒業する方法に関する基礎的研究\\
+%			--- そもそもそれは可能か？ ---}
+
+\指導教員名A{宮崎純}
+\職名A{教授}
+
+\指導教員名B{}
+\職名B{}
+
+%\所属学科{電気電子工学科}{}
+\所属学科{情報工学科}{}
+\学籍番号{14\_00368}
+\氏名{朝日 諒}
+
+\内容梗概{\input{abstract}}
+
+
+\begin{document}
+% ----------------------------------------------------------------------
+% 表紙
+\maketitle
+% ----------------------------------------------------------------------
+% 目次
+\setcounter{page}{1}
+\renewcommand{\thepage}{\roman{page}}
+\setcounter{tocdepth}{1}
+\tableofcontents
+\clearpage
+% ----------------------------------------------------------------------
+% 内容
+\setcounter{page}{1}
+\renewcommand{\thepage}{\arabic{page}}
+\input{introduction}
+\input{element}
+\input{relation}
+\input{proposal}
+\input{experiment}
+\input{conclusion}
+\input{acknowledgment}
+\input{reference}
+\input{appendix}
+% ----------------------------------------------------------------------
+\end{document}
