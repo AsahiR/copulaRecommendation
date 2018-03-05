@@ -1,0 +1,2 @@
+left,const_a,med,madn,bound_dict,kl_dict,prod,score_type_list,reduced,tl_score_type_list
+left,3.5,0.158817621936,0.138136845064,"OrderedDict([('bound1', -0.32466133578731049), ('bound2', 0.64229657965904607)])","{'roomScore': 0.30055795864988327, 'serviceScore': 0.15145096510805811, 'equipmentScore': 0.38913861320830034, 'bathScore': 0.050632782929418543, 'locationScore': 0.080517720106233967, 'mealScore': 0.16618427876367745}","[]","['equipmentScore', 'roomScore', 'mealScore', 'serviceScore', 'locationScore', 'bathScore']","[]","[]"
