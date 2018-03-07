@@ -56,4 +56,4 @@ class Copula:
     def get_optimized_param(self) -> float:
         return self._r_engine.get("trained.param")
     def get_param(self)->dict:
-        return {'trained_param':self.trained_param,'dimension',self._dimension}
+        return {'trained_param':self.trained_param,'dimension':self._dimension}

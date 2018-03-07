@@ -3,50 +3,61 @@ import numpy as np
 from marginal import marginal
 import urllib
 import json
-from typing import Dict, List
-#from scoring import models
+from typing import Dict, List,Tuple
 from scipy import integrate
 import functools
 import sys
 import math
-from measuring import measure
 import os
 import shutil
 from collections import OrderedDict
 import datetime
 
-def get_user_train_id_path(train_id:int,user_id:int)->str:
-    return 'user'+str(user_id)+'_'+str(train_id)+str(train_id)
 
-def get_user_id_path(method:str,user_id:int)->str:
+def inner_import():
+    global share
+    global measure
+    from sharing import shared as share
+    from measuring import measure
+
+def get_user_train_id_path(train_id:int,user_id:int)->str:
+    return 'user'+str(user_id)+'/train_'+str(share.TRAIN_SIZE)+'_'+str(train_id)
+
+def get_cluster_user_train_id_path(train_id:int,user_id:int)->str:
+    #backward comaptibility
+    return str(user_id)+'_'+str(share.TRAIN_SIZE)+'-'+str(train_id)+'.txt'
+
+def get_user_id_path(user_id:int)->str:
     return 'user'+str(user_id)
 
-def get_result_path(dir_name:str,method:str,train_id:None,user_id:None)->str:
-    ret=dir_name+'/'+method
-    if user_id:
-        if train_id:
-            ret+=get_user_train_id_path(user_id=user_id,train_id=train_id)
+def get_result_path(dir_name:str,method:str,user_id=None,train_id=None)->str:
+    ret=dir_name
+    if method:#except 0value
+        ret+='/'+method
+    if not user_id==None: #0 value equal False
+        if not train_id==None:
+            ret+='/'+get_user_train_id_path(user_id=user_id,train_id=train_id)
         else:
-            ret+=get_user_id_path(user_id=user_id)
+            ret+='/'+get_user_id_path(user_id=user_id)
     return ret
 
-def get_ids(index:int)->pd.Series:
+def get_ids(iloc:int)->pd.Series:
     if os.path.isfile(share.IDS_PATH):
         data=pd.read_csv(share.IDS_PATH)
         try:
-            ret=data.iloc[index]
+            ret=data.iloc[iloc]
             #access row by index_number
         except IndexError:
             #file exist but ,wrong id???
-            print('IndexError in util.get_ids()')
-            sys.exit()
+            sys.stderr.write(str(i_loc)+' is invalid. select i_loc from '+str(data.shape[0])+' to '+str(data.shape[0]))
+            sys.exit(share.ERROR_STATUS)
         #use goto???
     else:
-        print(share.IDS_PATH+' not found')
-        sys.exit()
+        sys.stderr.write(share.IDS_PATH+' not found')
+        sys.exit(share.ERROR_STATUS)
     return ret
 
-def get_score_mapping_param(user_id:int)->bool,dict,str:
+def get_score_mapping_param(user_id:int)->Tuple[bool,dict,str]:
     #mapping_dict,remapping,mapping_id
     path=share.PPL_TOP+'/'+'user'+str(user_id)
     if os.path.isfile(path):
@@ -56,47 +67,48 @@ def get_score_mapping_param(user_id:int)->bool,dict,str:
         score_mapping_dict=eval(row['score_mapping_dict'].values[0])
         mapping_id=row['mapping_id'].values[0]
     else:
-        return set_score_mapping_param(path,user_id)
+        sys.stderr.write('file '+path)
+        sys.exit(ERROR_STATUS)
 
-    return remapping,score_mapping_dict,row
+    return (remapping,score_mapping_dict,mapping_id)
 
-def set_score_mapping_param(path:str,user_id:int)->bool,dict,str:
+def set_score_mapping_param(path:str,user_id:int)->Tuple[bool,dict,str]:
     #first mapping
     init_file(path)
     score_mapping_dict=get_score_mapping_dict(user_id)
-    remapping=is_remapping(score_mapping_dict)
-    mapping_id=get_mapping_id(remapping,score_mapping_dict)
+    remapping=is_remapping(score_mapping_dict=score_mapping_dict)
+    mapping_id=get_mapping_id(remapping=remapping,score_mapping_dict=score_mapping_dict)
     object_quotation='"'
     header='left,remapping,score_mapping_dict,mapping_id\n'
     line='left,'+str(remapping)+','+object_quotation+str(score_mapping_dict)+object_quotation+','+str(mapping_id)+'\n'
     with open(path,'wt') as fout:
         fout.write(header)
         fout.write(line)
-    return remapping,score_mapping_dict,mapping_id
+    return (remapping,score_mapping_dict,mapping_id)
 
-def get_mapping_id(remapping:bool,score_mapping_dict:dict)->str:
+def get_mapping_id(remapping:bool,score_mapping_dict:Dict[str,Dict[str,float]])->str:
     #odd
     if remapping:
-        ret=share.DEFAUT_MAPPING_ID
-    else:
         ret=''
         for score_type in share.DISC_SCORE_TYPE_LIST:
             #order
             mapping_dict=score_mapping_dict[score_type]
             ret+=score_type
-            for key in score_mapping_dict.keys:
+            for key in mapping_dict.keys():
             #order
                 ret+='_'+key
+    else:
+        ret=share.DEFAULT_MAPPING_ID
+
     return ret
 
 
 def is_remapping(score_mapping_dict:dict)->bool:
-    ret=False
     for _,mapping_dict in score_mapping_dict.items():
         for key,value in mapping_dict.items():
-            if key==str(value):
-                ret=True
-    return ret
+            if not key==str(value):
+                return True
+    return False
 
 def get_true_false(user_id:int)->dict:
     file_name=share.TRUE_DATA_TOP+'/user'+str(user_id)+'_true.json'
@@ -122,14 +134,14 @@ def get_score_mapping_dict(user_id:str)->dict:
         score_data=data.loc[:,[score_type]]
         #order by mapping_dest_value
         mapping_dict=OrderedDict()
-        user_freq_dict=get_freq_dict(data,score_type)
+        user_freq_dict=get_freq_dict(data=data,score_type=score_type)
         all_freq_dict=share.ALL_ITEMS_SCORE_FREQ_DICT[score_type]
         ppl_dict={}#ppl=user_freq/all_freq
         for key in user_freq_dict:
-            ppl_dict[key]=user_freq/all_freq_dict[key]
+            ppl_dict[key]=user_freq_dict[key]/all_freq_dict[key]
         for value_index,item in enumerate(sorted(ppl_dict.items(),key=lambda x: x[1])):
             key=str(float(item[0]))#why int???
-            mapping_dict[key]=float(DISC_SCORE_SPACE_DICT[score_type][value_index])
+            mapping_dict[key]=float(share.DISC_SCORE_SPACE_DICT[score_type][value_index])
             #rank_dict={'0.0':1.0,'1.0':0.0} for freq(0.0)>freq(1.0)
         score_mapping_dict[score_type]=mapping_dict
     return score_mapping_dict
@@ -144,27 +156,18 @@ def init_dir(path:str):
     dirPath=os.path.dirname(path)
     if os.path.isdir(dirPath):
         shutil.rmtree(dirPath)
-
     os.makedirs(dirPath)
     return
 
-def init_file(path:str):#asahi
+def init_file(path:str):
     if os.path.isfile(path):
         os.remove(path)
-    existDir(path)
+    exist_dir(path)
     return
 
-
-def get_line_from_series(left:str,series:pd.Series)->str:
-    line=left
-    for index in series.index
-        line+=','+str(series[index])
-    return line
-    
-
 def kl_divergence_between_population_and_users(all_marg:marginal.Marginal,attn:str,score_type: str,user_marg: marginal.Marginal) -> float:
-    f=kl_expression(all_marg,users_marg)
-    if attn='shr':
+    f=kl_expression(all_marg,user_marg)
+    if attn==share.ATTN_SHR:
         res=0.0
         print('shr is done for '+attn)
         kl_func=kl_expression(user_marg,all_marg)
@@ -176,7 +179,7 @@ def kl_divergence_between_population_and_users(all_marg:marginal.Marginal,attn:s
     elif attn == share.ATTN_INF:
         res=0.0
         print('inf is done for '+attn)
-        kl_func=kl_expression(NORM_DICT[score_type],user_marg)
+        kl_func=kl_expression(all_marg,user_marg)
         if score_type in share.DISC_SCORE_TYPE_LIST and user_marg.get_marg_name()==share.KDE_CV:
             for v in share.DISC_SCORE_SPACE_DICT[score_type]:
                 res+=kl_func(v)*2*user_marg.get_param()['bw']
@@ -185,7 +188,6 @@ def kl_divergence_between_population_and_users(all_marg:marginal.Marginal,attn:s
     else:
         #warining???
         pass
-
     print(score_type+':'+str(res))
     return res
 
@@ -207,7 +209,7 @@ def list_of_users_axis_has_weight(user_id: int) -> List[str]:
 
 def get_users_preferences(user_id: int) -> Dict[str, float]:
     data = {}
-    with open(measure.InputDir+"/questionnaire/user" + str(user_id) + "axis.txt", "r") as file:
+    with open(share.QUESTIONNAIRE_TOP+'/user'+str(user_id)+'axis.txt','r') as file:
         file.readline() # Discard first line for columns description
         line = file.readline()
         while line:
@@ -264,8 +266,8 @@ def convert_score(data:pd.DataFrame,score_mapping_dict:dict):
             raw_value=float(data[score_type][i])
             data[score_type][i]=mapping_dict[str(raw_value)]
 
-def tlr_filter(ranking:pd.DataFrame,user_weight_and_score_model_list:List[(float,Dict[str,marginal.Marg])],all_weight_and_score_model_list:List[(float,Dict[str,marginal.Marg])],score_type_list:List[str],all_items:pd.DataFrame):
-    #change ranking
+def tlr_filter(all_items:pd.DataFrame,all_weight_and_score_model_list:List[Tuple[float,Dict[str,marginal.Marginal]]],ranking:pd.DataFrame,score_type_list:List[str],user_weight_and_score_model_list:List[Tuple[float,Dict[str,marginal.Marginal]]])->pd.DataFrame:
+    print(score_type_list)
     index_list=ranking.index
     ranking['dropped']=[int(0)]*ranking.shape[0]
     print('before')
@@ -277,7 +279,7 @@ def tlr_filter(ranking:pd.DataFrame,user_weight_and_score_model_list:List[(float
             user_pdf,all_pdf=0.0,0.0
             for w_cdf in user_weight_and_score_model_list:
                 user_pdf+=w_cdf[0]*w_cdf[1][score_type].pdf(x)
-            for w_cdf in all_weight_and_score_model_list
+            for w_cdf in all_weight_and_score_model_list:
                 all_pdf+=w_cdf[0]*w_cdf[1][score_type].pdf(x)
             if user_pdf < all_pdf:
                 appending_row=ranking.ix[hotel_id]
@@ -300,8 +302,8 @@ def get_train_data(data:pd.DataFrame,num:int) ->Dict[str,pd.DataFrame]:
             data=data.drop(i)# if index sequence constant
     return {'test':test_data,'train':data}
 
-def log_ranking(ranking:pd.DataFrame,all_items,pd.DataFrame,test_id_list:List[int],path:str,score_type_list:List[str]):
-    util.init_file(path)
+def log_ranking(all_items:pd.DataFrame,ranking:pd.DataFrame,path:str,score_type_list:List[str],test_id_list:List[int]):
+    init_file(path)
     if not 'dropped' in ranking.columns:
         #this means,tlr is invalid,not need to log
         return
@@ -311,34 +313,38 @@ def log_ranking(ranking:pd.DataFrame,all_items,pd.DataFrame,test_id_list:List[in
             header+=','+score_type
         header+='\n'
         fout.write(header)
-
-        for rank,index,row in enumerate(ranking.iterrows()):
+        for rank,index_row in enumerate(ranking.iterrows()):
+            index,row=index_row
             flag,line=0,'left'
             for test_id in test_id_list:
                 if index==test_id:
                     #truepositive
                     boolean=share.RANKING_TRUE_POSITIVE
-                    if ranking_row['dropped']==share.TLR_DROPPED:
+                    if row['dropped']==share.TLR_DROPPED:
                         #falsenegative
                         boolean=share.RANKING_FALSE_NEGATIVE
                     flag=1
                     break
-            if flag==0 and ranking_row['dropped']==share.TLR_DROPPED:
+            if flag==0 and row['dropped']==share.TLR_DROPPED:
                 #truenegative
                 boolean=share.RANKING_TRUE_NEGATIVE
             elif flag==0:
                 #falsenepositive
-                boolean=share.RANKING_FALSE_POSITVE
+                boolean=share.RANKING_FALSE_POSITIVE
 
             line='left'+','+boolean+','+str(rank)+','+str(index)+','+str(row['score'])
 
             for score_type in score_type_list:
-                line+=','+str(all_items[all_items['id']==x][score_type].values[0])
+                line+=','+str(all_items[all_items['id']==index][score_type].values[0])
             fout.write(line+'\n')
+
 def renew_allocation_ids(size:int,id_list:List[str]):
     #id_1,id_2,....
     dest=share.IDS_PATH
-    util.init_file(dest)
+    if os.path.isfile(dest):
+        sys.stderr.write(dest+' exist. Backup it and remove.retry\n')
+        sys.exit(share.ERROR_STATUS)
+    init_file(dest)
     header='left'
     for i in id_list:
         header+=','+i
@@ -346,7 +352,14 @@ def renew_allocation_ids(size:int,id_list:List[str]):
     id_h=datetime.datetime.now().strftime('%Y%m%d%H%M')
     with open(dest,'wt') as fout:
         fout.write(header)
-        line='left'
         for i in range(0,size):
-            line=','+id_h+'_'+str(i)
-        fout.write(line+'\n')
+            line='left'
+            for j in range(0,len(id_list)):
+                line+=','+id_h+'_'+str(i)
+            fout.write(line+'\n')
+
+def get_line_from_series(data:pd.Series,spitter:str,key_list:List[str],start=None)->str:
+    line=str(start)
+    for key in keys:
+        line+=splitter+str(data[key])
+    return line

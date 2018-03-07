@@ -11,6 +11,9 @@ def arg_check(x:int,X:list,Z:int,y=4,**z):
     x[1]=1
     print(x)
     X.append(1)
+def arg_check2(x:int,y:int,z:int,*arg):
+    print(str(x)+str(y)+str(z))
+    print(arg)
 
 class MetaClass(metaclass=ABCMeta):
     def __init__(self,arg:str):
@@ -145,8 +148,14 @@ with open('../data_input.txt','wt') as fout:
 
 X=[]
 arg_check(1,X=X,Z=4)
+arg_check(x='string',X=X,Z=4)
 arg_check(2,Z=5,X=X,O=3)
 arg_check(L=4,Z=7,x=3,X=X)
+if not '':
+    print('null')
+arg_check2(z=3,x=[1,2,3],y=1,Y='this is arg')
+#this is erro
+
 #if arg_name ,order not needed
 
 

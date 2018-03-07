@@ -1,11 +1,8 @@
 import math
 import copy
 import pandas as pd
-from scoring import models as model
-from utils import util
 import urllib.request
 import json
-from scoring import models
 from typing import List
 from statistics import variance
 from multiprocessing import Pool
@@ -14,9 +11,16 @@ import os
 import shutil
 from multiprocessing import Process,Manager
 import fasteners
-from plotting import plot
-from marginal import marginal
 import datetime
+from typing import List, Tuple, Dict
+from marginal import marginal
+from scoring import models
+
+def inner_import():
+    global share
+    global util
+    from sharing import shared as share
+    from utils import util
 
 # This implementation is ad-hoc for writing paper.
 def ip(df: pd.DataFrame, test_data_id_list: List[int]) -> List[float]:
@@ -121,27 +125,26 @@ def adhoc_task(df: pd.DataFrame, n: int, test_data_id_list: List[int]) -> List[b
     return rels
 
 def adhoc_testing_task(file_name: str, labels: List[bool]):
-    l = len(labels)
-    fout = open(file_name, 'wt')
     num_label = ['1' if lbl else '0' for lbl in labels]
-    fout.write(",".join(num_label))
-    fout.write('\n')#org
-    fout.close()
+    util.init_file(file_name)
+    with open(file_name,'wt') as fout:
+        fout.write(",".join(num_label))
+        fout.write('\n')#org
 
 # モデルの評価を行う関数
 # モデルクラスに各ユーザごとに訓練→　評価を繰り返し、最後にそれらの平均をファイルに出力する
-def do_measure(score_model: models.ScoreModel,group:List[int]):
-    score_model_remapping=score_model.get_remapping()
+def do_measure(model: models.ScoreModel,group:List[int]):
+    model_remapping=model.get_remapping()
     for user_id in group:
         print('###########################################')
         print('user = ' + str(user_id))
         print('###########################################')
         respective_method_measures_dict = {}
-        user_k_folded_path=share.TRAIN_ID_TOP+'user'+str(user_id)+'/user'+str(user_id)+'k_folded.json'
+        user_k_folded_path=share.TRAIN_DATA_TOP+'/user'+str(user_id)+'_kfolded.json'
         with open(user_k_folded_path,'rt') as fin:#k_folded_path???
             kfolded_training_and_test_data_list = json.load(fin)
 
-        if score_model.get_ramapping():
+        if model_remapping:
             remapping,score_mapping_dict,mapping_id=util.get_score_mapping_param(user_id)
         else:
             remapping=False
@@ -150,78 +153,67 @@ def do_measure(score_model: models.ScoreModel,group:List[int]):
             all_items=copy.deepcopy(share.ALL_ITEMS)
             util.convert_score(all_items,score_mapping_dict)
         else:
-            mapping_id=share.DEFAUT_MAPPING_ID
+            mapping_id=share.DEFAULT_MAPPING_ID
             all_items=share.ALL_ITEMS#shallow copy
 
         for train_id,training_and_test_data in enumerate(kfolded_training_and_test_data_list):
-            user_train_id_path=util.get_user_train_id_path(user_id=user_id,train_id)
             training_hotel_list = training_and_test_data['trainingTrue']
             training_false_hotel_list = training_and_test_data['trainingFalse']
             test_hotel_list = training_and_test_data['testTrue']
             test_false_hotel_list = training_and_test_data['testFalse']
 
-            score_model.train(training_data_t=pd.DataFrame.from_records(training_hotel_list),training_data_f=pd.DataFrame.from_records(training_false_hotel_list), all_items=all_items,mapping_id=mapping_id,train_id=train_id,user_id=user_id)
-            #log parameter of score_model.train()
-            score_model.make_log(all_items=all_items)
+            model.train(training_data_t=pd.DataFrame.from_records(training_hotel_list),training_data_f=pd.DataFrame.from_records(training_false_hotel_list), all_items=all_items,mapping_id=mapping_id,train_id=train_id,user_id=user_id)
+            #log parameter of model.train()
+            model.make_log(all_items=all_items)
 
-            ranking_dict = score_model.calc_ranking(all_items=all_items)
-            test_data_id_list = [test_data['id'] for test_data in test_hotel_list]
-            training_data_id_list = [training_data['id'] for training_data in training_hotel_list]
+            ranking_dict = model.calc_ranking(all_items=all_items)
+            test_hotel_id_list = [test_hotel['id'] for test_hotel in test_hotel_list]
+            training_hotel_id_list = [training_hotel['id'] for training_hotel in training_hotel_list]
+            training_false_hotel_id_list = [training_false_hotel['id'] for training_false_hotel in training_false_hotel_list]
 
             for method, ranking in ranking_dict.items():
-                ranking_df = ranking
-                ranking_df = ranking_df.drop([training_data['id'] for training_data in training_hotel_list])
-                ranking_df = ranking_df.drop([training_data['id'] for training_data in training_false_hotel_list])
-
+                ranking = ranking.drop(training_hotel_id_list)
+                ranking = ranking.drop(training_false_hotel_id_list)
                 print(method+'\n')
-                print(ranking_df)
-                dest=util.get_result_path(dir_name=share.RANKING_TOP+'/'+score_model.get_dir_name(),user_id=user_id,train_id=train_id)
-                util.log_ranking(ranking=ranking_df,path=dest,all_items=all_items,test_id_list=test_id_list,score_type_list=score_model.get_score_type_list())
+                print(ranking)
+                dest=util.get_result_path(dir_name=share.RANKING_TOP+'/'+model.get_dir_name(),method=method,user_id=user_id,train_id=train_id)
+                util.log_ranking(all_items=all_items,ranking=ranking,path=dest,score_type_list=model.get_score_type_list(),test_id_list=test_hotel_id_list)
                 #odd???
                 if method not in respective_method_measures_dict:
-                    respective_method_measures_dict={}
+                    temp={}
                     for measure_type in share.MEASURE_TYPE_LIST:
-                        temp=[.0]*share.MEASURE_TYPE_MEASURE_DICT[measure_type].shape[0]
-                        respective_method_measures_dict[measure_type]=temp
-                    respective_method_measures_dict['label@10'],respective_method_measures_dict['labe@l20'],respective_method_measures_dict['label@30']=[],[],[]
+                        temp[measure_type]=[.0]*share.MEASURE_TYPE_MEASURE_DICT[measure_type].shape[0]
+                    for label_type in share.LABEL_TYPE_LIST:
+                        temp[label_type]=[]
+                    respective_method_measures_dict[method]=temp
 
-                ips = ip(ranking_df, test_data_id_list)
-                for i in share.MEASURE_TYPE_MEASURE_DICT['iP'].shape[0]:
+                ips = ip(ranking, test_hotel_id_list)
+                for i in range(0,share.MEASURE_TYPE_MEASURE_DICT['iP'].shape[0]):
+                    #enumerate???
                     respective_method_measures_dict[method]['iP'][i] += ips[i]
                 respective_method_measures_dict[method]['MAiP'][0] += ips[11]
-                for i in share.MEASURE_TYPE_MEASURE_DICT['nDCG'].shape[0]:
-                    respective_method_measures_dict[method]['nDCG'][i] += n_dcg(ranking_df, 5*(i+1), test_data_id_list)
-                for i in share.MEASURE_TYPE_MEASURE_DICT['P'].shape[0]:
-                    respective_method_measures_dict[method]['P'][i] += precision(ranking_df, 5*(i+1), test_data_id_list)
+                for i in range(0,share.MEASURE_TYPE_MEASURE_DICT['nDCG'].shape[0]):
+                    respective_method_measures_dict[method]['nDCG'][i] += n_dcg(ranking, 5*(i+1), test_hotel_id_list)
+                for i in range(0,share.MEASURE_TYPE_MEASURE_DICT['P'].shape[0]):
+                    respective_method_measures_dict[method]['P'][i] += precision(ranking, 5*(i+1), test_hotel_id_list)
 
-                respective_method_measures_dict[method]['label@10'].extend(adhoc_task(ranking_df, 10, test_data_id_list))
-                respective_method_measures_dict[method]['label@20'].extend(adhoc_task(ranking_df, 20, test_data_id_list))
-                respective_method_measures_dict[method]['label@30'].extend(adhoc_task(ranking_df, 30, test_data_id_list))
+                for i,label_type in enumerate(share.LABEL_TYPE_LIST):
+                    respective_method_measures_dict[method][label_type].extend(adhoc_task(ranking,10*(i+1) , test_hotel_id_list))
 
         for method, respective_measures in respective_method_measures_dict.items():
-            file_name=util.get_result_path(dir_name=share.RESULT_TOP+'/'+score_model.get_dir_name,user_id=user_id,method=method)
+            file_name=util.get_result_path(dir_name=share.RESULT_TOP+'/'+model.get_dir_name(),method=method,user_id=user_id)
             util.init_file(file_name)
             with open(file_name, 'wt') as fout:
-                header='file,user,'
-                for meaure in share.MEASURE_LIST:
-                    header+=','+measure
+                header='file,user'
                 line=file_name+',user'+str(user_id)
-                for item in range(0, len(respective_measures['iP'])):
-                    respective_measures['iP'][item] /= share.TRAIN_SIZE
-                    line+=str(respective_measures['iP'][item])+','
-                for item in range(0, len(respective_measures['MAiP'])):
-                    respective_measures['MAiP'][item] /= share.TRAIN_SIZE
-                    line+=str(respective_measures['MAiP'][item])+','
-                for item in range(0, len(respective_measures['P'])):
-                    respective_measures['P'][item] /= share.TRAIN_SIZE
-                    line+=str(respective_measures['P'][item])+','
-                for item in range(0, len(respective_measures['nDCG'])):
-                    respective_measures['nDCG'][item] /= share.TRAIN_SIZE
-                    if not item == 0:
-                        line+=','
-                    line+=str(respective_measures['nDCG'][item])
+                for measure_type in share.MEASURE_TYPE_LIST:
+                    for item,measure in enumerate(share.MEASURE_TYPE_MEASURE_DICT[measure_type]):
+                        header+=','+measure
+                        line+=','+str(respective_measures[measure_type][item]/share.TRAIN_SIZE)
+                header+='\n'
                 line+='\n'
                 fout.write(header+line)
-            method_measures_dict[method]['label@10'].extend(respective_measures['label10'])
-            method_measures_dict[method]['label@20'].extend(respective_measures['label20'])
-            method_measures_dict[method]['label@30'].extend(respective_measures['label30'])
+
+            for label_type in share.LABEL_TYPE_LIST:
+                label_file_name=util.get_result_path(dir_name=share.LABEL_TOP+'/'+label_type+'/'+model.get_dir_name(),method=method,user_id=user_id)
+                adhoc_testing_task(label_file_name,respective_measures[label_type])
