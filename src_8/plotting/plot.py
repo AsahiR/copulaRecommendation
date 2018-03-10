@@ -25,8 +25,6 @@ color_list_users=['black','grey','green','cyan','blue','yellow','orchid','orange
 
 SCORE_TYPE_COLOR_DICT={}
 
-
-#measures_dict={'ips': {'columns':['ip0','ip0.1','ip0.2','ip0.3','ip0.4','ip0.5','ip0.6','ip0.7','ip0.8','ip0.9','ip1.0'],'xs':[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]},'ndcgs':{'columns': ['ndcg5','ndcg10','ndcg15','ndcg20','ndcg30'],'xs':[5,10,15,20,30]}, 'precision':{'columns': ['pre5','pre10','pre15','pre20','pre30'],'xs':[5,10,15,20,30]}}
 measures_dict={'ips': {'columns':['ip0','ip0.1','ip0.2','ip0.3','ip0.4','ip0.5'],'xs':[0,0.1,0.2,0.3,0.4,0.5]},'ndcgs':{'columns': ['ndcg5','ndcg10','ndcg15','ndcg20','ndcg30'],'xs':[5,10,15,20,30]}, 'precision':{'columns': ['pre5','pre10','pre15','pre20','pre30'],'xs':[5,10,15,20,30]}}
 
 RANK_COLOR_LIST=['red','orange','yellow','greenyellow','olive','blue','black']
@@ -634,33 +632,30 @@ def plot_existScoreBooleanCdf(score_model: models.ScoreModel,user_id:str,title:s
             print("message:{0}".format(e))
 
 
-def plot_existScoreBoolean(score_model: models.ScoreModel,user_id:str,title:str,boolean_value:int,boolean_elements:list,title2:str,k:int):
-    init_vars()
-    set_user_score_type_list_dict(score_model)
-    all_input_path=measure.PDF_DIR+score_model.get_dirname()+'/'+score_model.get_modelname()+'/all_items'+util.getNormedOpt(option=True,header='user'+user_id,user_id=int(user_id))+'.txt'
-    user_input_path=measure.PDF_DIR+score_model.get_dirname()+'/'+score_model.get_modelname()+'/'+util.getNormedOpt(header='user'+str(user_id),user_id=int(user_id))+'_'+str(k)+'.txt'
-
-
-    user_data=pd.read_csv(user_input_path)
-    user_data=user_data[user_data['k']==k]
+def plot_existScoreBoolean(score_model: models.ScoreModel,user_id:str,title:str,method:str,boolean_value:int,denominator_list:List[int],title2:str,k:int):
+    _,_,mapping_id=get_score_mapping_param(user_id)
+    all_items_marg_path=score_model.get_dest_dict()['all_items_marg_dict']+'/'+mapping_id
+    #all marg data
     all_data=pd.read_csv(all_input_path)
+    for train_id in range(share.TRAIN_SIZE):
+        user_input_path=score_model.get_dest_dict()['pdf_and_cdf']+'/'+util.get_user_train_id_path(user_id=user_id,train_id)
+        #user marg data
+        user_data=pd.read_csv(user_input_path)
+        #ranking data
+        rank_inpput_path=util.get_result_path(dir_name=share.RANKING_TOP+'/'+score_model.get_dir_name(),method=method,user_id=user_id,train_id=train_id)
 
-    #rank data
-    rank_input_path=measure.OutputDir+'/exist_id/'+score_model.get_dirname()+'/'+util.getNormedOpt(user_id=int(user_id),header='/user'+str(user_id))+'/'+'emp-prod'+'_'+score_model.get_modelname()
-    rank_data=pd.read_csv(rank_input_path)
-    rank_data=rank_data[rank_data['k']==k]
+        rank_data=pd.read_csv(rank_input_path)
 
     #count true/false sum
-    sum_size=0
-    for boolean_element in boolean_elements:
-        sum_size+=rank_data[rank_data['boolean']==boolean_element].shape[0]
-
+    denominator_size=0
+    for denominator in denominator_list:
+        denominator_size+=rank_data[rank_data['boolean']==denominator].shape[0]
     rank_data=rank_data[rank_data['boolean']==boolean_value]
     size=rank_data.shape[0]
-
-    for score_type in USER_SCORE_TYPE_LIST_DICT[user_id]:
+    for score_type in share.DEFAULT_SCORE_TYPE:
         try:
-            marg_path=OutputExistScoreDir+'/'+score_model.get_dirname()+'/'+score_model.get_modelname()+'/'+util.getNormedOpt(header='user'+str(user_id),user_id=int(user_id))+'/'+score_type+'_'+title+str(boolean_value)+'/'+str(k)+'.png'
+            dest=COM+'/'+score_model.get_dir_name()+'/'+score_type+'/'+util.get_user_train_id_path(user_id=user_id,train_id=train_id)
+            marg_path=OutputExistScoreDir+'/'+score_model.get_dirname()+'/'+score_model.get_modelname()+'/'+util.getNormedOpt(header='user'+str(user_id),user_id=int(user_id))+'/'+sco
             util.initFile(marg_path)
             all_data=all_data.sort_values(by=score_type, ascending=False)
             user_data=user_data.sort_values(by=score_type, ascending=False)
@@ -753,7 +748,7 @@ def plotBooleanNum(score_model:models.ScoreModel,boolean_value:int,title:str,k:i
     pyplot.figure()
 
 
-def plot_existScoreBoolean(score_model: models.ScoreModel,user_id:str,title:str,boolean_value:int,boolean_elements:list,title2:str,k:int):
+def plot_existScoreBoolean(score_model: models.ScoreModel,user_id:str,title:str,boolean_value:int,boolean_compares:List[int],title2:str,k:int):
     init_vars()
     set_user_score_type_list_dict(score_model)
     all_input_path=measure.PDF_DIR+score_model.get_dirname()+'/'+score_model.get_modelname()+'/all_items'+util.getNormedOpt(option=True,header='user'+user_id,user_id=int(user_id))+'.txt'

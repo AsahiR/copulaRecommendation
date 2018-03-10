@@ -1,0 +1,2 @@
+file,user,iP@0,iP@0.1,iP@0.2,iP@0.3,iP@0.4,iP@0.5,iP@0.6,iP@0.7,iP@0.8,iP@0.9,iP@1.0,MAiP,nDCG@5,nDCG@10,nDCG@15,nDCG@20,nDCG@25,nDCG@30,P@5,P@10,P@15,P@20,P@25,P@30
+../cont/cluster_id_depend/cluster_id_201803072213_0/result/axis-kl-reduced/option_remapping_False/copula-gumbel_cluster_5/shr_a=2.5/tlr__limit_None/gaussian/option_/nonprod/user10,user10,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.9886363636363636,0.9655172413793103,0.8378968253968254,0.6626887497423212,0.9504308345595291,1.0,1.0,1.0,1.0,0.9995371114408923,0.99822492706456,1.0,1.0,1.0,1.0,0.96,0.8833333333333334

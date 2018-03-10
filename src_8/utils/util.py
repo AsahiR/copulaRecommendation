@@ -20,25 +20,32 @@ def inner_import():
     from sharing import shared as share
     from measuring import measure
 
-def get_user_train_id_path(train_id:int,user_id:int)->str:
-    return 'user'+str(user_id)+'/train_'+str(share.TRAIN_SIZE)+'_'+str(train_id)
+def get_user_train_id_path(user_id=None,train_id=None)->str:
+    ret=''
+    try:
+        if user_id:
+            ret+='user'+str(user_id)
+            if not train_id==None:#0 value equal to False
+                ret+='/'
+                raise Exception()
+        elif not train_id==None:
+            raise Exception()
+    except:
+        ret+='train_'+str(share.TRAIN_SIZE)+'_'+str(train_id)
+    return ret
 
-def get_cluster_user_train_id_path(train_id:int,user_id:int)->str:
+def get_cluster_path(dir_name:str,user_id:int,train_id:int)->str:
     #backward comaptibility
-    return str(user_id)+'_'+str(share.TRAIN_SIZE)+'-'+str(train_id)+'.txt'
+    return dir_name+'/'+str(user_id)+'_'+str(share.TRAIN_SIZE)+'-'+str(train_id)+'.txt'
 
-def get_user_id_path(user_id:int)->str:
-    return 'user'+str(user_id)
 
 def get_result_path(dir_name:str,method:str,user_id=None,train_id=None)->str:
     ret=dir_name
-    if method:#except 0value
+    if method:
         ret+='/'+method
-    if not user_id==None: #0 value equal False
-        if not train_id==None:
-            ret+='/'+get_user_train_id_path(user_id=user_id,train_id=train_id)
-        else:
-            ret+='/'+get_user_id_path(user_id=user_id)
+    tmp=get_user_train_id_path(user_id=user_id,train_id=train_id)
+    if tmp:
+        ret+='/'+get_user_train_id_path(user_id=user_id,train_id=train_id)
     return ret
 
 def get_ids(iloc:int)->pd.Series:
@@ -342,7 +349,7 @@ def renew_allocation_ids(size:int,id_list:List[str]):
     #id_1,id_2,....
     dest=share.IDS_PATH
     if os.path.isfile(dest):
-        sys.stderr.write(dest+' exist. Backup it and remove.retry\n')
+        sys.stderr.write(dest+' exist.\nBackup it and remove.retry\n')
         sys.exit(share.ERROR_STATUS)
     init_file(dest)
     header='left'

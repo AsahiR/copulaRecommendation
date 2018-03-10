@@ -3,7 +3,7 @@ Usage:
     __init__.py renew_allocation [--allocation_size=arg]
     __init__.py get_result_table [--iloc=arg] [cont]
     __init__.py set_ppl (--group=arg)
-    __init__.py kl (gaussian | kde_cv [(cont_grid <cont_start> <cont_end> <cont_size> [--cont_space=arg])] [(disc_grid <disc_space> <disc_start> <disc_end> <disc_size> [--disc_space=arg] [--disc_kernel=arg])]) (--group=arg)  ([--iloc=arg]|i_reuse_cluster) [--cluster=arg] [--copula=arg] [--const_a=arg]  [cont] [--attn=arg] ([--tlr=arg] [--tlr_num_upper=arg] [--tlr_ol=arg] | [i_tlr]) [i_remapping] [i_reuse_pickle]
+    __init__.py kl (gaussian | kde_cv [(cont_grid <cont_start> <cont_end> <cont_size> [--cont_space=arg])] [(disc_grid <disc_space> <disc_start> <disc_end> <disc_size> [--disc_space=arg] [--disc_kernel=arg])]) (--group=arg)  [--iloc=arg] [i_reuse_cluster] [--cluster=arg] [--copula=arg] [--const_a=arg]  [cont] [--attn=arg] ([--tlr=arg] [--tlr_num_upper=arg] [--tlr_ol=arg] | [i_tlr]) [i_remapping] [i_reuse_pickle]
     __init__.py (line | svm  <g_start> <g_end> <g_space> [--c=arg]) (--group=arg) [cont] [i_remapping] [--iloc=arg]
 
 Options:
@@ -55,13 +55,13 @@ if __name__ == '__main__':
 
         
     if args['cont']:
-        input_type,remapping='cont',False
+        input_type,remapping=share.CONT,False
         if args['--group']:
             group=eval(args['--group'])
         else:
             group=share.CONT_USERS
     else:
-        input_type,remapping='disc',not args['i_remapping']
+        input_type,remapping=share.DISC,not args['i_remapping']
         if args['--group']=='u_shape':
             group=share.U_SHAPE_USERS
         elif args['--group']=='all':
@@ -83,7 +83,7 @@ if __name__ == '__main__':
 
     #output for tex
     if args['get_result_table']:
-        compare.get_result_table()
+        compare.get_result_table_from_input_type(input_type)
         sys.exit()
 
     if args['i_reuse_cluster'] and os.path.isdir(share.CLUSTER_DATA_TOP):

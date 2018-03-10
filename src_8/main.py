@@ -1,5 +1,49 @@
 from abc import ABCMeta, abstractmethod
 import pandas as pd
+import json
+
+user_k_folded_path='../disc/train_data/user33_kfolded.json'
+with open(user_k_folded_path,'rt') as fin:#load train_and_test_data
+    kfolded_training_and_test_data_list = json.load(fin)
+for i,training_and_test_data in enumerate(kfolded_training_and_test_data_list):
+    if i==1:
+        break
+    training_hotel_list = training_and_test_data['trainingTrue']
+    training_data_t=pd.DataFrame.from_records(training_hotel_list)
+
+hotel_cluster=[]
+for cluster_num in range(2):
+    hotel_cluster.append(pd.DataFrame())
+    for i in range(training_data_t.shape[0]):
+        row=training_data_t.iloc[i]#iloc use number
+        print(str(row))
+        hotel_cluster[cluster_num] = hotel_cluster[cluster_num].append(row)
+
+print('hotel_cluster')
+print(hotel_cluster)
+
+class Copula():
+    def __init__(self):
+        print('Copula init')
+    def train(self,**arg):
+        def inner_train(user_id:str):
+            self.user_id='unko'
+        inner_train(arg['user_id'])
+
+class SuperCopula(Copula):
+    def __init__(self):
+        super().__init__()
+        print('SuperCopula')
+    def train(self,**arg):
+        def inner_train(user_id:str,train_id:str):
+            self.user_id=user_id
+            self.train_id=train_id
+            super(SuperCopula,self).train(user_id=user_id)
+        inner_train(arg['user_id'],arg['train_id'])
+        print(self.user_id+self.train_id)
+
+supercopula=SuperCopula()
+supercopula.train(user_id='outer',train_id='outer_train')
 
 def arg_check(x:int,X:list,Z:int,y=4,**z):
     #call by reference

@@ -73,7 +73,7 @@ def create_weight_and_scoring_model_list(
         marginal_cdf_list_list = []
         scoring_model = {}
         for score_type in score_type_list:
-            marginal_score_list = chunk[score_type]
+            marginal_score_list = chunk[score_type].values
             marginal_score_model=marginal.factory_marg(marg_name=marg_name,marg_option=marg_option)
             marginal_score_model.set_param(training_data=marginal_score_list,score_type=score_type)
                 
@@ -86,10 +86,10 @@ def create_weight_and_scoring_model_list(
         weight_and_score_model_list.append((len(chunk)/total_item_size, scoring_model))
     return weight_and_score_model_list
 
-def create_cluster(df:pd.DataFrame, n_clusters: int,target_axis_list: List[str],train_id:int,user_id:int)->List[pd.DataFrame]:
+def create_cluster(df:pd.DataFrame, n_clusters: int,target_axis_list: List[str],train_id:int,user_id:int,remapping:bool)->List[pd.DataFrame]:
     #n_clusters from 1,pred from 0
     hotel_cluster = []
-    path=share.CLUSTER_DATA_TOP+'/cluster_'+str(n_clusters)+'/'+util.get_cluster_user_train_id_path(train_id=train_id,user_id=user_id)
+    path=util.get_cluster_path(dir_name=share.CLUSTER_DATA_TOP+'/remapping_'+str(remapping)+'/cluster_'+str(n_clusters),train_id=train_id,user_id=user_id)
     #odd
     if share.REUSE_CLUSTER and os.path.isfile(path):
         #reuse valid and cluster_file exist
@@ -100,7 +100,7 @@ def create_cluster(df:pd.DataFrame, n_clusters: int,target_axis_list: List[str],
         for column in df.columns:
             header+=','+column
         header+='\n'
-        with open(path) as fout:
+        with open(path,'wt') as fout:
             fout.write(header)
             if n_clusters == 1:
                 hotel_cluster = [df]
@@ -118,10 +118,10 @@ def create_cluster(df:pd.DataFrame, n_clusters: int,target_axis_list: List[str],
                     hotel_cluster.append(pd.DataFrame())
                 for i, cluster_num in enumerate(pred):
                     line=str(n_clusters)+','+str(cluster_num)
-                    row=df.iloc(i)
+                    row=df.iloc[i]#iloc use number
                     hotel_cluster[cluster_num] = hotel_cluster[cluster_num].append(row)
                     # id_ignore???
-                    line=util.get_line_from_series(key_list=data.index,data=row,splitter=',',start=line)
+                    line=util.get_line_from_series(key_list=row.index,data=row,splitter=',',start=line)
                     fout.write(line+'\n')
     return hotel_cluster
 
@@ -148,16 +148,20 @@ class CopulaScoreModel(ScoreModel):
         #marg_model for path construction or kl-profile
         self.marg_model=marginal.factory_marg(marg_name,marg_option=marg_option)
         self.marg_name,self.marg_option=marg_name,marg_option
+
     def set_dest_dict(self):
         # call before make_log
         super().set_dest_dict()
         self.dest_dict['log_marg_param']=share.MARG_PARAM_TOP+'/'+self.get_dir_name()
         self.dest_dict['pdf_and_cdf']=share.PDF_CDF_TOP+'/'+self.get_dir_name()
+
     def get_dir_name(self)->str:
         return self.get_model_name()+'/'+self.get_option_name()+'/'+self.marg_model.get_dir_name()
+
     def make_log(self,all_items:pd.DataFrame):
         self.log_pdf_and_cdf(all_items)
         self.log_marg_param()
+
     def log_pdf_and_cdf(self,all_items:pd.DataFrame):
         #user,id,score_type,score_type_pdf,score_type_cdf,...
         dest=self.dest_dict['pdf_and_cdf']+'/'+self.user_train_id_path
@@ -207,12 +211,14 @@ class CopulaScoreModel(ScoreModel):
     def train(self,**args):
         def inner_train(training_data_t: pd.DataFrame, training_data_f: pd.DataFrame,user_id:int,train_id:int):
             self.train_id,self.user_id=train_id,user_id
-            self.user_train_id_path=util.get_user_train_id_path(train_id,user_id)
-            hotel_cluster = create_cluster(df=training_data_t,n_clusters=self.n_clusters,target_axis_list=self.score_type_list,train_id=self.train_id,user_id=self.user_id)
+            self.user_train_id_path=util.get_user_train_id_path(train_id=train_id,user_id=user_id)
+            hotel_cluster = create_cluster(df=training_data_t,n_clusters=self.n_clusters,target_axis_list=self.score_type_list,train_id=self.train_id,user_id=self.user_id,remapping=self.remapping)
 
             # 混合コピュラの構築
             self.weight_and_score_model_list = create_weight_and_scoring_model_list(hotel_cluster=hotel_cluster, marg_name=self.marg_name,marg_option=self.marg_option, cop=self.cop, score_type_list=self.score_type_list)
+
         inner_train(args['training_data_t'],args['training_data_f'],args['user_id'],args['train_id'])
+
     def calc_ranking(self, all_items: pd.DataFrame) -> dict:
         dict_list = []
         dict_list_not_prod = []
@@ -237,21 +243,6 @@ class CopulaScoreModel(ScoreModel):
 
                 cdf_matrix = np.matrix(marginal_cdf_list)
                 c_mix += score_model['copula'].cdf(cdf_matrix) * weight
-                #for debug
-                if c_mix == float('inf'):
-                    dest='../inf_check/'+str(self.user_id)
-                    if not self.train_id:
-                        util.init_file(dest)
-                    with open(dest,'at') as fout:
-                        fout.write('train_id '+str(self.train_id)+'\n')
-                        fout.write('weight '+str(weight)+'\n')
-                        fout.write('c_mix '+str(c_mix)+'\n')
-                        fout.write(str(score_model['copula'].get_param())+'\n')
-                        fout.write('cdf_matrix '+str(cdf_matrix)+'\n')
-                        for score_type in self.score_type_list:
-                            fout.write(score_type+' '+str(score_model[score_type].cdf(row[score_type]))+'\n')
-                        for score_type in self.score_type_list:
-                            fout.write(score_type+' '+str(score_model[score_type].get_param())+'\n')
 
             marginal_score = 1
             emp = 1
@@ -261,13 +252,6 @@ class CopulaScoreModel(ScoreModel):
                     emp *= value
 
             prod = c_mix * marginal_score
-            if math.isnan(prod) or prod==float('inf'):
-                print(str(prod)+'='+str(c_mix)+'*'+str(marginal_score))
-                print(str(marg_dict))
-                print(str(score_model['mealScore'].param))
-                print(str(score_model['mealScore'].data_list))
-
-                sys.exit()
             dict_list.append({"id": hotel_id, "score": prod})
             dict_list_not_prod.append({"id": hotel_id, "score": c_mix})
             dict_list_emp.append({"id": hotel_id, "score": c_mix * emp})
@@ -319,7 +303,7 @@ class CopulaScoreModelDimensionReducedByUsingKL(CopulaScoreModel):
             fout.write(header)
             fout.write(line)
 
-    def select_axis(self,mapping_id:str,training_data_t: pd.DataFrame, training_data_f: pd.DataFrame,all_items:pd.DataFrame):
+    def select_axis(self,mapping_id:str,training_data_t: pd.DataFrame, training_data_f: pd.DataFrame,all_items:pd.DataFrame,axis:List[str]):
         if (not self.mapping_id) or (not self.mapping_id == mapping_id):
             #self.mapping_id is init or reset ,reset all_items_marg
             self.mapping_id=mapping_id
@@ -327,7 +311,7 @@ class CopulaScoreModelDimensionReducedByUsingKL(CopulaScoreModel):
             all_items_marg_path=self.dest_dict['all_items_marg_dict']+'/'+mapping_id
             if share.REUSE_PICKLE:
                 if os.path.isfile(all_items_marg_path) and share.REUSE_PICKLE:
-                    #already modelde,deserialize
+                    #already modeled,deserialize
                     with open(all_items_marg_path,'rb') as fin:
                         self.all_items_marg_dict=pickle.load(fin)
                 else:
@@ -338,16 +322,16 @@ class CopulaScoreModelDimensionReducedByUsingKL(CopulaScoreModel):
                 #not yet modeled,model and serialize
                 util.init_file(all_items_marg_path)
                 self.all_items_marg_dict={}
-                for score_type in share.DEFAULT_SCORE_TYPE_LIST:
+                for score_type in axis:
                     all_marg=marginal.factory_marg(marg_name=self.marg_name,marg_option=self.marg_option)
-                    all_marg.set_param(training_data=all_items[score_type],score_type=score_type)
+                    all_marg.set_param(training_data=all_items[score_type].values,score_type=score_type)
                     self.all_items_marg_dict[score_type]=all_marg 
                 with open(all_items_marg_path,'wb') as fout:
                     pickle.dump(self.all_items_marg_dict,fout)
                 
         self.kl_dict = {}
-        for score_type in self.score_type_list:
-            self.marg_model.set_param(training_data=training_data_t[score_type],score_type=score_type)
+        for score_type in axis:
+            self.marg_model.set_param(training_data=training_data_t[score_type].values,score_type=score_type)
             kl = util.kl_divergence_between_population_and_users(all_marg=self.all_items_marg_dict[score_type],attn=self.attn,score_type=score_type,user_marg=self.marg_model)
             self.kl_dict[score_type] = kl
 
@@ -366,7 +350,7 @@ class CopulaScoreModelDimensionReducedByUsingKL(CopulaScoreModel):
         self.med,self.madn=med,madn
         
         # self.score_type sorted by attn
-        axis=sorted(self.score_type_list,key=lambda x: float(self.kl_dict[x]),reverse=True)
+        axis=sorted(axis,key=lambda x: float(self.kl_dict[x]),reverse=True)
         self.prod_axis=[x for x in axis if self.kl_dict[x] > bound_dict['bound2']]
         self.tlr_axis=[]
         if self.tlr_limit:#tlr valid
@@ -409,10 +393,11 @@ class CopulaScoreModelDimensionReducedByUsingKL(CopulaScoreModel):
         def inner_train(training_data_t: pd.DataFrame, training_data_f: pd.DataFrame,user_id:int,train_id:int,all_items:pd.DataFrame,mapping_id:str):
             self.user_id,self.train_id=user_id,train_id
             self.user_train_id_path=util.get_user_train_id_path(train_id=train_id,user_id=user_id)
-            self.select_axis(mapping_id=mapping_id,training_data_t=training_data_t, training_data_f=training_data_f,all_items=all_items)
+            self.select_axis(mapping_id=mapping_id,training_data_t=training_data_t, training_data_f=training_data_f,all_items=all_items,axis=share.DEFAULT_SCORE_TYPE_LIST)
             super(CopulaScoreModelDimensionReducedByUsingKL,self).train(training_data_t=training_data_t, training_data_f=training_data_f,user_id=user_id,train_id=train_id)
             #mapping_id is new, self.mapping_id is old
         inner_train(args['training_data_t'],args['training_data_f'],args['user_id'],args['train_id'],args['all_items'],args['mapping_id'])
+
     def calc_ranking(self,all_items:pd.DataFrame)->dict:
         #{method:ranking,...}
         temp_ranking_dict=super().calc_ranking(all_items=all_items)

@@ -141,14 +141,14 @@ def do_measure(model: models.ScoreModel,group:List[int]):
         print('###########################################')
         respective_method_measures_dict = {}
         user_k_folded_path=share.TRAIN_DATA_TOP+'/user'+str(user_id)+'_kfolded.json'
-        with open(user_k_folded_path,'rt') as fin:#k_folded_path???
+        with open(user_k_folded_path,'rt') as fin:#load train_and_test_data
             kfolded_training_and_test_data_list = json.load(fin)
 
         if model_remapping:
             remapping,score_mapping_dict,mapping_id=util.get_score_mapping_param(user_id)
-        else:
+        else:#remapping invalid for group users
             remapping=False
-        if remapping:
+        if remapping:#differ from default mapping,=>remapping valid
             #deepcopy
             all_items=copy.deepcopy(share.ALL_ITEMS)
             util.convert_score(all_items,score_mapping_dict)
@@ -156,7 +156,7 @@ def do_measure(model: models.ScoreModel,group:List[int]):
             mapping_id=share.DEFAULT_MAPPING_ID
             all_items=share.ALL_ITEMS#shallow copy
 
-        for train_id,training_and_test_data in enumerate(kfolded_training_and_test_data_list):
+        for train_id,training_and_test_data in enumerate(kfolded_training_and_test_data_list):#train and test by TRAIN_SIZEs
             training_hotel_list = training_and_test_data['trainingTrue']
             training_false_hotel_list = training_and_test_data['trainingFalse']
             test_hotel_list = training_and_test_data['testTrue']

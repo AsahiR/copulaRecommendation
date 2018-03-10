@@ -1,0 +1,2 @@
+left,cluster,weight,equipmentScore,roomScore,serviceScore,mealScore,distanceScore,locationScore,copula
+left,0,1.0,"{'mean': 0.7636842105263156, 'std': 0.06774788528190896}","{'mean': 0.7935526315789476, 'std': 0.07402891961141651}","{'mean': 0.7867763157894738, 'std': 0.07449357829827592}","{'mean': 0.7567763157894738, 'std': 0.09223740647713007}","{'mean': 0.8455360623781841, 'std': 0.08359209458559949}","{'mean': 0.8376973684210527, 'std': 0.08441448091105115}","{'trained_param': 370.700576599139, 'dimension': 6}"

@@ -26,6 +26,7 @@ DISC_USERS=[x for x in range(1,36) if not (x==19 or x==34)]
 ATT_SMK_USERS=[1,9,12,13,14,15,16,17,18]
 U_SHAPE_USERS=[ x for x in range(20,36) if not x == 34]
 SIMPLE_USERS=[ x for x in DISC_USERS if not ( x in ATT_SMK_USERS or x in U_SHAPE_USERS)]
+print(SIMPLE_USERS)
 
 
 def set_tops(cluster_id:str,input_type:str):
@@ -119,6 +120,9 @@ def depend_remapping(remapping:bool):
           ALL_ITEMS_SCORE_FREQ_DICT[score_type]=util.get_freq_dict(ALL_ITEMS,score_type)
 
 IDS_PATH='../ids.txt'
+
+DISC='disc'
+CONT='cont'
 
 DISC_SCORE_TYPE_LIST=['kinnennScore']
 DISC_SCORE_SPACE_DICT={'kinnennScore':[0.0,1.0]}

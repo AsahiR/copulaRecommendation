@@ -46,7 +46,7 @@ class Marginal(metaclass=ABCMeta):
         return ret
         
     @abstractmethod
-    def set_param(self,training_data:pd.Series,**args):
+    def set_param(self,**args):
         raise NotImplementedError
     #log_param to utils/util.py for cluster
     def get_option_name(self)->str:
@@ -114,41 +114,43 @@ class KdeCv(Marginal):
             self.option_name+='_'+str(i)
         self.cont_option=[cont_kernel,cont_space,cont_search_list]
         self.disc_option=[disc_kernel,disc_space,disc_search_list]
-
-    def set_param(self,training_data: pd.Series,score_type:str,cv_num=3):
-        self.score_type=score_type
-        self.data_list=training_data
-        self.cv_num=cv_num
-        if score_type in share.DISC_SCORE_TYPE_LIST:
-            self.option=self.disc_option
-        else:
-            self.option=self.cont_option
-        self.kernel,space,search_list=self.option
-        start,end,size=search_list
-        self.search_list=get_search_array(space,start,end,size)
-            
-        self.n=self.data_list.shape[0]
-        #untyped by kernel
-        self.scott,self.silverman=0,0
-        #variance>0 for silverman,scott
-        if variance(self.data_list) > .0:
-            self.scott=get_slv_sct(self.data_list,'scott')
-            self.silverman=get_slv_sct(self.data_list,'silverman')
-            self.search_list=np.concatenate([self.search_list,np.array([self.scott,self.silverman])])
-        #print(self.search_list)
-        #to method
-        grid = GridSearchCV(KernelDensity(kernel=self.kernel),
-        {'bandwidth': self.search_list},cv=min([self.n,self.cv_num]))
-        grid.fit(self.data_list[:,None])#[[data1],[data2],...]
-        #best is ideal,bw is actual
-        self.best=grid.best_params_['bandwidth']
-        self.bw=self.best
-        while True:
-            tmp=self.cdf(1.0)
-            if tmp!=0 and (not tmp==float("inf")) and (not math.isnan(tmp)):
-                break;
-            self.bw*=10
-        self.param={'cv_num':self.cv_num,'search_list':self.search_list,'bw':self.bw,'best_bw':self.best,'kernel':self.kernel,'score_type':self.score_type}
+    
+    def set_param(self,**args):
+        def inner_set_param(training_data: np.array,score_type:str,cv_num=3):
+            self.score_type=score_type
+            self.data_list=training_data
+            self.cv_num=cv_num
+            if score_type in share.DISC_SCORE_TYPE_LIST:
+                self.option=self.disc_option
+            else:
+                self.option=self.cont_option
+            self.kernel,space,search_list=self.option
+            start,end,size=search_list
+            self.search_list=get_search_array(space,start,end,size)
+                
+            self.n=self.data_list.shape[0]
+            #untyped by kernel
+            self.scott,self.silverman=0,0
+            #variance>0 for silverman,scott
+            if variance(self.data_list) > .0:
+                self.scott=get_slv_sct(self.data_list,'scott')
+                self.silverman=get_slv_sct(self.data_list,'silverman')
+                self.search_list=np.concatenate([self.search_list,np.array([self.scott,self.silverman])])
+            #print(self.search_list)
+            #to method
+            grid = GridSearchCV(KernelDensity(kernel=self.kernel),
+            {'bandwidth': self.search_list},cv=min([self.n,self.cv_num]))
+            grid.fit(self.data_list[:,None])#[[data1],[data2],...]
+            #best is ideal,bw is actual
+            self.best=grid.best_params_['bandwidth']
+            self.bw=self.best
+            while True:
+                tmp=self.cdf(1.0)
+                if tmp!=0 and (not tmp==float("inf")) and (not math.isnan(tmp)):
+                    break;
+                self.bw*=10
+            self.param={'cv_num':self.cv_num,'search_list':self.search_list,'bw':self.bw,'best_bw':self.best,'kernel':self.kernel,'score_type':self.score_type}
+        inner_set_param(args['training_data'],args['score_type'])
     def pdf(self, x: float) -> float:
         res=0
         if self.kernel==share.GAUSSIAN:
@@ -184,11 +186,12 @@ class Norm(Marginal):
     def __init__(self,marg_name:str):
         super().__init__()
         self.marg_name=share.GAUSSIAN
-    def set_param(self,training_data:pd.Series,**args):
-        #odd
-        self.data_list=training_data
-        self.mean = training_data.mean()
-        self.sd = training_data.std()
-        self.param= {'mean':self.mean,'std':self.sd}
+    def set_param(self,**args):
+        def inner_set_param(training_data:np.array):
+            training_data=pd.Series(training_data)#pd.std not equal to np.std
+            self.mean = training_data.mean()
+            self.sd = training_data.std()
+            self.param= {'mean':self.mean,'std':self.sd}
+        inner_set_param(args['training_data'])
     def pdf(self, x: float) -> float:
         return norm.pdf(x=x, loc=self.mean, scale=self.sd)

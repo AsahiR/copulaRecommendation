@@ -63,17 +63,28 @@ def set_compare_dict():
     for _,(_,model) in disc_compare_dict.items():
         model.set_dest_dict()
 
-def get_result_table():
-    #for cont
-    for title,group in [('all',share.CONT_USERS)]:
-        set_exam_tex_form(group=group,compare_dict=cont_compare_dict,title=title)
-        get_exam_tex_form(compare_list=cont_compare_dict.keys(),compared='$proposal$',title=title)
-        get_measure_tex_form(group=group,compare_dict=cont_compare_dict,title=title)
-    #for disc
-    for title,group in [('all',share.DISC_USERS),('u_shape',share.U_SHAPE_USERS),('att_smk',share.ATT_SMK_USERS),('simple',share.SIMPLE_USERS)]:
-        set_exam_tex_form(group=group,compare_dict=disc_compare_dict,title=title)
-        get_exam_tex_form(compare_list=disc_compare_dict.keys(),compared='$proposal$',title=title)
-        get_measure_tex_form(group=group,compare_dict=disc_compare_dict,title=title)
+def get_result_table(compare_dict:Dict[str,models.ScoreModel],title_group_list:List[Tuple[str,List[int]]]):
+    compared='$proposal$'
+    compare_list=[x for x in compare_dict.keys() if not x==compared]
+    for title,group in title_group_list:
+        set_exam_tex_form(group=group,compare_dict=compare_dict,title=title)
+        get_exam_tex_form(compare_list=compare_list,compared=compared,title=title)
+        get_measure_tex_form(group=group,compare_dict=compare_dict,title=title)
+
+
+def get_result_table_from_input_type(input_type:str):
+    if input_type==share.CONT:
+        compare_dict=cont_compare_dict
+        title_group_list=[('all',share.CONT_USERS)]
+    elif input_type==share.DISC:
+        compare_dict=disc_compare_dict
+        title_group_list=[('all',share.DISC_USERS),('u_shape',share.U_SHAPE_USERS),('att_smk',share.ATT_SMK_USERS),('simple',share.SIMPLE_USERS)]
+    else:
+        sys.stderr.write('invalid input_type\n')
+        sys.exit(share.ERROR_STATUS)
+    get_result_table(compare_dict=compare_dict,title_group_list=title_group_list)
+
+
 
 def set_exam_tex_form(group:List[int],compare_dict:Dict[str,Tuple[str,models.ScoreModel]],title:str):
     #OrderedDict,compare_dict={'key':(method,model),...},OrderedDict
@@ -85,7 +96,6 @@ def set_exam_tex_form(group:List[int],compare_dict:Dict[str,Tuple[str,models.Sco
     for measure_type in share.MEASURE_TYPE_LIST:
         for measure in share.MEASURE_TYPE_MEASURE_DICT[measure_type]:
             dest=dest_h+'/'+measure
-            util.init_file(dest)
             header='user_id'
             for key in keys:
                 header+=splitter+key
@@ -125,14 +135,17 @@ def get_exam_tex_form(compare_list:List[str],compared:str,title:str):
                 source=source_h+'/'+measure
                 data=pd.read_csv(source)
                 for compare in compare_list:
+                    try:
                     #manwhitney u-test
-                    u,p=stats.mannwhitneyu(data[compared],data[compare],alternative='greater')
-                    line+=splitter+str(round(p,share.DIGIT))
+                        u,p=stats.mannwhitneyu(data[compared],data[compare],alternative='greater')
+                        line+=splitter+str(round(p,share.DIGIT))
+                    except ValueError:
+                        line+=splitter+str(np.nan)
                 if i+1==measure_array.shape[0]:
                     line+=measure_type_suffix
                 else:
                     line+=measure_suffix
-            fout.write(line)
+                fout.write(line)
 
 def get_measure_tex_form(group:List[int],compare_dict:Dict[str,Tuple[str,models.ScoreModel]],title:str):#compare_dict must be OrderedDict
     dest=dir_name=share.TEX_MEASURE_TOP+'/'+title

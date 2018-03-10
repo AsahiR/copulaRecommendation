@@ -22,12 +22,14 @@ class Copula:
         self._r_engine.assign("py.param", param)
         self._r_engine.assign("py.dim", self._dimension)
         self._r_engine('source("copula/copula.R")')
-        self.trained_param = self._r_engine.get("trained.param")
-        if self.trained_param is None:
+        self._r_engine('source("copula/copula.R")')
+        trained_param = self._r_engine.get("trained.param")
+        self.trained_param = trained_param#asahi
+        if trained_param is None:
             self._r_engine('trained <- indepCopula(dim=%d)' % self._dimension)
             print('indep')
         else:
-            print(self.trained_param)
+            print(trained_param)
 
     # Caution! This method is not thread safe.
     def cdf(self, marginal_dist_matrix: np.matrix) -> float:
@@ -55,5 +57,6 @@ class Copula:
 
     def get_optimized_param(self) -> float:
         return self._r_engine.get("trained.param")
+
     def get_param(self)->dict:
         return {'trained_param':self.trained_param,'dimension':self._dimension}
