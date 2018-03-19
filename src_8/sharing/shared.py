@@ -26,8 +26,6 @@ DISC_USERS=[x for x in range(1,36) if not (x==19 or x==34)]
 ATT_SMK_USERS=[1,9,12,13,14,15,16,17,18]
 U_SHAPE_USERS=[ x for x in range(20,36) if not x == 34]
 SIMPLE_USERS=[ x for x in DISC_USERS if not ( x in ATT_SMK_USERS or x in U_SHAPE_USERS)]
-print(SIMPLE_USERS)
-
 
 def set_tops(cluster_id:str,input_type:str):
     #set bool RENEW_ID and dirname
@@ -142,10 +140,17 @@ TLR_PROD='prod'
 TLR_NUM_UPPER='num_upper'
 TLR_DROPPED=1
 TLR_NOT_DROPPED=0
-RANKING_TRUE_POSITIVE='0'
-RANKING_TRUE_NEGATIVE='1'
-RANKING_FALSE_NEGATIVE='2'
-RANKING_FALSE_POSITIVE='3'
+RANKING_TRUE_POSITIVE=0
+RANKING_TRUE_NEGATIVE=1
+RANKING_FALSE_NEGATIVE=2
+RANKING_FALSE_POSITIVE=3
+"""
+above odd
+RANKING_TRUE_POSITIVE='true_positive'
+RANKING_TRUE_NEGATIVE='true_negative'
+RANKING_FALSE_NEGATIVE='false_negative'
+RANKING_FALSE_POSITIVE='false_positive'
+"""
 
 MEASURE_TYPE_MEASURE_DICT={
 'iP':np.array(['iP@0','iP@0.1','iP@0.2','iP@0.3','iP@0.4','iP@0.5','iP@0.6','iP@0.7','iP@0.8','iP@0.9','iP@1.0']),

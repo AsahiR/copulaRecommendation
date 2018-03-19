@@ -2,6 +2,7 @@
 Usage:
     __init__.py renew_allocation [--allocation_size=arg]
     __init__.py get_result_table [--iloc=arg] [cont]
+    __init__.py plot [--iloc=arg] [cont]
     __init__.py set_ppl (--group=arg)
     __init__.py kl (gaussian | kde_cv [(cont_grid <cont_start> <cont_end> <cont_size> [--cont_space=arg])] [(disc_grid <disc_space> <disc_start> <disc_end> <disc_size> [--disc_space=arg] [--disc_kernel=arg])]) (--group=arg)  [--iloc=arg] [i_reuse_cluster] [--cluster=arg] [--copula=arg] [--const_a=arg]  [cont] [--attn=arg] ([--tlr=arg] [--tlr_num_upper=arg] [--tlr_ol=arg] | [i_tlr]) [i_remapping] [i_reuse_pickle]
     __init__.py (line | svm  <g_start> <g_end> <g_space> [--c=arg]) (--group=arg) [cont] [i_remapping] [--iloc=arg]
@@ -32,6 +33,7 @@ from copula import copula
 from comparing import compare
 from utils import util
 from sharing import shared as share
+from plotting import plot
 #renew id or set id in doc_opt???
 
 if __name__ == '__main__':  
@@ -40,6 +42,7 @@ if __name__ == '__main__':
     models.inner_import()
     measure.inner_import()
     compare.inner_import()
+    plot.inner_import()
 
     args=docopt(__doc__, version='2018_2_27')
     print(args) 
@@ -109,6 +112,11 @@ if __name__ == '__main__':
             for mapping_id in mapping_id_user_dict.keys():
                 line=mapping_id+','+object_quotation+str(mapping_id_user_dict[mapping_id])+object_quotation
                 fout.write(line+'\n')
+        sys.exit()
+
+    if args['plot']:
+        plot.set_score_space_dict()
+        plot.test_plot()
         sys.exit()
 
     #set marg

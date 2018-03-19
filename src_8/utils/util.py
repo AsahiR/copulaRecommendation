@@ -72,7 +72,8 @@ def get_score_mapping_param(user_id:int)->Tuple[bool,dict,str]:
         row=pd.read_csv(path)
         remapping=row['remapping'].values[0]
         score_mapping_dict=eval(row['score_mapping_dict'].values[0])
-        mapping_id=row['mapping_id'].values[0]
+        #mapping_id=row['mapping_id'].values[0]
+        mapping_id=get_mapping_id(remapping=remapping,score_mapping_dict=score_mapping_dict)
     else:
         sys.stderr.write('file '+path)
         sys.exit(ERROR_STATUS)
@@ -365,8 +366,8 @@ def renew_allocation_ids(size:int,id_list:List[str]):
                 line+=','+id_h+'_'+str(i)
             fout.write(line+'\n')
 
-def get_line_from_series(data:pd.Series,spitter:str,key_list:List[str],start=None)->str:
+def get_line_from_series(data:pd.Series,splitter:str,key_list:List[str],start=None)->str:
     line=str(start)
-    for key in keys:
+    for key in key_list:
         line+=splitter+str(data[key])
     return line
