@@ -153,7 +153,6 @@ def do_measure(model: models.ScoreModel,group:List[int]):
             all_items=copy.deepcopy(share.ALL_ITEMS)
             util.convert_score(all_items,score_mapping_dict)
         else:
-            mapping_id=share.DEFAULT_MAPPING_ID
             all_items=share.ALL_ITEMS#shallow copy
 
         for train_id,training_and_test_data in enumerate(kfolded_training_and_test_data_list):#train and test by TRAIN_SIZEs
@@ -164,7 +163,7 @@ def do_measure(model: models.ScoreModel,group:List[int]):
 
             model.train(training_data_t=pd.DataFrame.from_records(training_hotel_list),training_data_f=pd.DataFrame.from_records(training_false_hotel_list), all_items=all_items,mapping_id=mapping_id,train_id=train_id,user_id=user_id)
             #log parameter of model.train()
-            model.make_log(all_items=all_items)
+            model.make_log()
 
             ranking_dict = model.calc_ranking(all_items=all_items)
             test_hotel_id_list = [test_hotel['id'] for test_hotel in test_hotel_list]

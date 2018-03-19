@@ -45,7 +45,7 @@ class ScoreModel(metaclass=ABCMeta):
         return self.model_name+'/'+self.option_name
     def get_option_name(self) -> str:
         return self.option_name
-    def make_log(self,all_items:pd.DataFrame):
+    def make_log(self):
         pass
     def get_score_type_list(self):
         return self.score_type_list
@@ -59,7 +59,7 @@ class ScoreModel(metaclass=ABCMeta):
     def calc_ranking(self, all_items: pd.DataFrame) -> dict:
         raise NotImplementedError
 
-def create_weight_and_scoring_model_list(
+def create_weight_and_score_model_list(
         hotel_cluster: List[pd.DataFrame],
         marg_name:str,
         cop: str,
@@ -152,62 +152,29 @@ class CopulaScoreModel(ScoreModel):
     def set_dest_dict(self):
         # call before make_log
         super().set_dest_dict()
-        self.dest_dict['log_marg_param']=share.MARG_PARAM_TOP+'/'+self.get_dir_name()
-        self.dest_dict['pdf_and_cdf']=share.PDF_CDF_TOP+'/'+self.get_dir_name()
+        self.dest_dict['log_weight_and_score_model_list']=share.WEIGHT_AND_SCORE_MODEL_LIST_TOP+'/'+self.get_dir_name()
 
     def get_dir_name(self)->str:
         return self.get_model_name()+'/'+self.get_option_name()+'/'+self.marg_model.get_dir_name()
 
-    def make_log(self,all_items:pd.DataFrame):
-        self.log_pdf_and_cdf(all_items)
-        self.log_marg_param()
+    def make_log(self):
+        self.log_weight_and_score_model_list()
 
-    def log_pdf_and_cdf(self,all_items:pd.DataFrame):
-        #user,id,score_type,score_type_pdf,score_type_cdf,...
-        dest=self.dest_dict['pdf_and_cdf']+'/'+self.user_train_id_path
+    def log_weight_and_score_model_list(self):
+        dest=self.dest_dict['log_weight_and_score_model_list']+'/'+self.user_train_id_path
         util.init_file(dest)
-        header='user,id'
-        for score_type in self.score_type_list:
-            header+=','+score_type+','+score_type+'_pdf'+','+score_type+'_cdf'
-        header+='\n'
-        with open(dest,'wt') as fout:
-            fout.write(header)
-            for i,row in all_items.iterrows():
-                line=str(self.user_id)+','+str(row['id'])
-                for score_type in self.score_type_list:
-                    x=float(row[score_type])
-                    pdf=0.0
-                    cdf=0.0
-                    for w_cdf in self.weight_and_score_model_list:
-                        pdf+=w_cdf[0]*w_cdf[1][score_type].pdf(x)
-                    for w_cdf in self.weight_and_score_model_list:
-                        cdf+=w_cdf[0]*w_cdf[1][score_type].cdf(x)
-                    line+=','+str(x)+','+str(pdf)+','+str(cdf)
-                line+='\n'
-                fout.write(line)
+        # copula have '_'leading variable. This leads to pyper.RError
+        # For this,pickle model_list except copula
+        pickled=[]
+        for weight,score_model_dict in self.weight_and_score_model_list:
+            temp_dict={}
+            for key,value in score_model_dict.items():
+                if not key == 'copula':
+                    temp_dict[key]=value
+            pickled.append((weight,temp_dict))
+        with open(dest,'wb') as fout:
+            pickle.dump(pickled,fout)
 
-    def log_marg_param(self):
-        #left,cluster,weight,score_type(="{key1:value1,...}"),...
-        dest=self.dest_dict['log_marg_param']+'/'+self.user_train_id_path
-        util.init_file(dest)
-        header='left,cluster,weight'
-        #slice is shallow?deep???
-        keys=copy.deepcopy(self.score_type_list)
-        keys.append('copula')
-        for key in keys:
-            header+=','+key
-        header+='\n'
-        line='left'
-        for cluster,(w,model_dict) in enumerate(self.weight_and_score_model_list):
-            line+=','+str(cluster)+','+str(w)
-            for key in keys:
-                object_quotation='"'
-                line+=','+object_quotation+str(model_dict[key].get_param())+object_quotation
-            line+='\n'
-        with open(dest,'wt') as fout:
-            fout.write(header)
-            fout.write(line)
-    
     def train(self,**args):
         def inner_train(training_data_t: pd.DataFrame, training_data_f: pd.DataFrame,user_id:int,train_id:int):
             self.train_id,self.user_id=train_id,user_id
@@ -215,7 +182,7 @@ class CopulaScoreModel(ScoreModel):
             hotel_cluster = create_cluster(df=training_data_t,n_clusters=self.n_clusters,target_axis_list=self.score_type_list,train_id=self.train_id,user_id=self.user_id,remapping=self.remapping)
 
             # 混合コピュラの構築
-            self.weight_and_score_model_list = create_weight_and_scoring_model_list(hotel_cluster=hotel_cluster, marg_name=self.marg_name,marg_option=self.marg_option, cop=self.cop, score_type_list=self.score_type_list)
+            self.weight_and_score_model_list = create_weight_and_score_model_list(hotel_cluster=hotel_cluster, marg_name=self.marg_name,marg_option=self.marg_option, cop=self.cop, score_type_list=self.score_type_list)
 
         inner_train(args['training_data_t'],args['training_data_f'],args['user_id'],args['train_id'])
 
@@ -231,9 +198,9 @@ class CopulaScoreModel(ScoreModel):
             for score_type in self.score_type_list:
                 marg_dict[score_type] = 0
 
-            for weight_and_scoring_model in self.weight_and_score_model_list:
-                weight = weight_and_scoring_model[0]
-                score_model = weight_and_scoring_model[1]
+            for weight_and_score_model in self.weight_and_score_model_list:
+                weight = weight_and_score_model[0]
+                score_model = weight_and_score_model[1]
                 marginal_cdf_list = []
                 for score_type in self.score_type_list:
                     marginal_score_model = score_model[score_type]
@@ -283,8 +250,8 @@ class CopulaScoreModelDimensionReducedByUsingKL(CopulaScoreModel):
         self.const_a=const_a
         self.tlr,self.tlr_limit=tlr,tlr_limit
         self.option_name+='/tlr_'+tlr+'_limit_'+str(tlr_limit)
-    def make_log(self,all_items:pd.DataFrame):
-        super().make_log(all_items)
+    def make_log(self):
+        super().make_log()
         self.log_axis()
     def set_dest_dict(self):
         super().set_dest_dict()

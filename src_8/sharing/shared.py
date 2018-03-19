@@ -2,12 +2,14 @@
 ppl exist for disc
 path tree
 ../input_type/{ppl/,questionnaire/,true_data/,false_data/,all_items.json,train_data/,cluster_depend/}
-/cluster_depend/cluster_id_x/{result/,param/,tex/,compare/,plot/,cluster_data/,ranking/}
+/cluster_depend/cluster_id_x/{result/,param/,tex/,plot/,cluster_data/,ranking/}
 /cluster_data/cluster_num/user_x_train_id.txt
 /result/model_name/user_id.txt
-/param/{kl-profile,pdf,cdf,marg,pickle}
-/pdf/{model_name/user_id_train_id.txt}
-/pickle/all_items/model_name/mapping_id.txt
+/param/{kl-profile,pickle}
+/pickle/{all_items,weight_and_score_model_list}
+all_items/model_name/mapping_id.txt
+weight_and_score_model_list/model_name/user_id_train_id.txt
+
 """
 import numpy as np
 import pandas as pd
@@ -72,15 +74,13 @@ def set_secondary_tops():
     global    RESULT_TOP
     global    TEX_TOP
     global    PLOT_TOP
-    global    COMPARE_TOP
     global    RANKING_TOP
     global    CLUSTER_DATA_TOP
-    global    PDF_CDF_TOP
-    global    MARG_PARAM_TOP
     global    KL_PROFILE_TOP
     global    PICKLE_TOP
     global    LABEL_TOP
     global    ALL_ITEMS_MARG_DICT_TOP
+    global    WEIGHT_AND_SCORE_MODEL_LIST_TOP
     global    ALL_ITEMS 
     global TEX_EXAM_SOURCE_TOP
     global TEX_EXAM_TOP
@@ -96,18 +96,16 @@ def set_secondary_tops():
     CLUSTER_DATA_TOP=CLUSTER_ID_TOP+'/cluster_data'
     LABEL_TOP=CLUSTER_ID_TOP+'/label'
 
-    PDF_CDF_TOP=PARAM_TOP+'/pdf_cdf'
-    MARG_PARAM_TOP=PARAM_TOP+'/marg_param'
     KL_PROFILE_TOP=PARAM_TOP+'/kl_profile'
     PICKLE_TOP=PARAM_TOP+'/pickle'
     ALL_ITEMS_MARG_DICT_TOP=PICKLE_TOP+'/all_items_marg_param'
+    WEIGHT_AND_SCORE_MODEL_LIST_TOP=PICKLE_TOP+'/weight_and_score_model_list'
 
     TEX_EXAM_SOURCE_TOP=TEX_TOP+'/tex_exam_source'
     TEX_EXAM_TOP=TEX_TOP+'/tex_exam'
     TEX_MEASURE_TOP=TEX_TOP+'/tex_measure'
 
     ALL_ITEMS = pd.read_json(ALL_ITEMS_PATH)
-
 
 def depend_remapping(remapping:bool):
     if remapping:
@@ -140,17 +138,16 @@ TLR_PROD='prod'
 TLR_NUM_UPPER='num_upper'
 TLR_DROPPED=1
 TLR_NOT_DROPPED=0
+"""
 RANKING_TRUE_POSITIVE=0
 RANKING_TRUE_NEGATIVE=1
 RANKING_FALSE_NEGATIVE=2
 RANKING_FALSE_POSITIVE=3
 """
-above odd
 RANKING_TRUE_POSITIVE='true_positive'
 RANKING_TRUE_NEGATIVE='true_negative'
 RANKING_FALSE_NEGATIVE='false_negative'
 RANKING_FALSE_POSITIVE='false_positive'
-"""
 
 MEASURE_TYPE_MEASURE_DICT={
 'iP':np.array(['iP@0','iP@0.1','iP@0.2','iP@0.3','iP@0.4','iP@0.5','iP@0.6','iP@0.7','iP@0.8','iP@0.9','iP@1.0']),

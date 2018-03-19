@@ -1,2 +1,2 @@
 left,remapping,score_mapping_dict,mapping_id
-left,False,"{'kinnennScore': OrderedDict([('0.0', 0.0), ('1.0', 1.0)])}",kinnennScore_0.0_1.0
+left,False,"{'kinnennScore': OrderedDict([('0.0', 0.0), ('1.0', 1.0)])}",mapping_default

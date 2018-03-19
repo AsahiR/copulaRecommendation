@@ -34,7 +34,6 @@ from comparing import compare
 from utils import util
 from sharing import shared as share
 from plotting import plot
-#renew id or set id in doc_opt???
 
 if __name__ == '__main__':  
     util.inner_import()
@@ -89,11 +88,13 @@ if __name__ == '__main__':
         compare.get_result_table_from_input_type(input_type)
         sys.exit()
 
+    #reuse previous cluster result or not
     if args['i_reuse_cluster'] and os.path.isdir(share.CLUSTER_DATA_TOP):
         sys.stderr.write(share.CLUSTER_DATA_TOP+' exist\n')
         sys.stderr.write("iloc "+str(iloc)+" is used."+"Retry command+='--iloc=another_loc'\n")
         sys.exit(share.ERROR_STATUS)
 
+    #set ppl param per user of  group
     if args['set_ppl']:
         mapping_id_user_dict={}
         for user_id in group:
@@ -114,6 +115,7 @@ if __name__ == '__main__':
                 fout.write(line+'\n')
         sys.exit()
 
+    #do plotting from result
     if args['plot']:
         plot.set_score_space_dict()
         plot.test_plot()
@@ -162,9 +164,10 @@ if __name__ == '__main__':
     elif tlr=='prod':
         tlr_limit=eval(const_a)
 
-    #reuse all_items marg parameter
+    #reuse all_items marg parameter or not
     share.set_reuse_pickle(not args['i_reuse_pickle'])
 
+    #set score_model and measure it
     if args['kl']:
         model = models.CopulaScoreModelDimensionReducedByUsingKL(n_clusters=cluster,marg_name=marg_name,remapping=remapping,attn=attn,const_a=const_a,cop=cop,tlr=tlr,tlr_limit=tlr_limit,marg_option=marg_option)
     elif args['line']:
@@ -182,4 +185,3 @@ if __name__ == '__main__':
     model.set_dest_dict()
     #measure
     measure.do_measure(model,group=group)
-

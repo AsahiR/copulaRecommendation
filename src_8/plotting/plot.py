@@ -62,9 +62,11 @@ def plot_marg_and_rank(model: models.ScoreModel,user_id:str,train_id:int,method:
     with open(all_items_marg_path,'rb') as fin:
         all_marg_dict=pickle.load(fin)
 
-    user_input_path=model.get_dest_dict()['pdf_and_cdf']+'/'+util.get_user_train_id_path(user_id=user_id,train_id=train_id)
+    user_input_path=model.get_dest_dict()['log_weight_and_score_model_list']+'/'+util.get_user_train_id_path(user_id=user_id,train_id=train_id)
     #user marg data
-    user_data=pd.read_csv(user_input_path,index_col='id')
+    with open(user_input_path,'rb') as fin:
+        user_weight_marg_dict_list=pickle.load(fin)
+        
     #ranking data
     rank_input_path=util.get_result_path(dir_name=share.RANKING_TOP+'/'+model.get_dir_name(),method=method,user_id=user_id,train_id=train_id)
 
@@ -88,14 +90,15 @@ def plot_marg_and_rank(model: models.ScoreModel,user_id:str,train_id:int,method:
         dest=util.get_result_path(dir_name=share.PLOT_TOP+'/marg_and_boolean/'+model.get_dir_name()+'/'+dest_path_tail,method=method,user_id=user_id,train_id=train_id)+'/'+score_type
         try:
             all_pdf=all_marg_dict[score_type].pdf
-            user_data=user_data.sort_values(by=score_type, ascending=False)
-            xs=user_data[score_type].values
-            ys=user_data[score_type+'_pdf'].values
+            user_pdf=util.get_pdf_from_weight_marg_dict_list(weight_marg_dict_list=user_weight_marg_dict_list,score_type=score_type)
+
+            xs=[x for x in np.arange(SCORE_SPACE_DICT[score_type][1],SCORE_SPACE_DICT[score_type][0],0.01)]
+            ys=[user_pdf(x) for x in xs]
             xs_all=xs
             ys_all=[all_pdf(x) for x in xs_all]
             for i,color in enumerate(color_list):
-                bool_xs=[user_data.loc[index][score_type] for index in ranking_list[i]]
-                bool_ys=[user_data.loc[index][score_type+'_pdf'] for index in ranking_list[i]]
+                bool_xs=[bool_data.loc[index][score_type] for index in ranking_list[i]]
+                bool_ys=[user_pdf(x) for x in bool_xs]
                 pyplot.scatter(bool_xs,bool_ys,label='top'+str((i+1)*rank_space),color=color)
             pyplot.plot(xs_all,ys_all,label='all_items')
             pyplot.plot(xs,ys,label='user')

@@ -3,7 +3,7 @@ import numpy as np
 from marginal import marginal
 import urllib
 import json
-from typing import Dict, List,Tuple
+from typing import Dict, List,Tuple,Callable
 from scipy import integrate
 import functools
 import sys
@@ -199,7 +199,7 @@ def kl_divergence_between_population_and_users(all_marg:marginal.Marginal,attn:s
     print(score_type+':'+str(res))
     return res
 
-def kl_expression(all_marg:pd.DataFrame,user_marg:marginal.Marginal):
+def kl_expression(all_marg:pd.DataFrame,user_marg:marginal.Marginal)->Callabel[[float],float]:
     #typing
     def function(x:float)->float:
         p=all_marg.pdf
@@ -371,3 +371,12 @@ def get_line_from_series(data:pd.Series,splitter:str,key_list:List[str],start=No
     for key in key_list:
         line+=splitter+str(data[key])
     return line
+
+def get_pdf_from_weight_marg_dict_list(weight_marg_dict_list:List[Tuple[float,Dict[str,marginal.Marginal]]],score_type:str)->Callable[[float],float]:
+    def func(x:float)->float:
+        ret=.0
+        for weight,marg_dict in weight_marg_dict_list:
+            #closure ok???
+            ret+=weight*marg_dict[score_type].pdf(x)
+        return ret
+    return func
