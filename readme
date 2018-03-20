@@ -1,45 +1,78 @@
-#ソースコードのリファクタリングが未完成です.進捗報告がてら現在の成果物をアップロードしますが動作確認が済んでいない上に結果の可視化まで手が回っていません.3/7までに完成版をアップロードします.
-
-#ディレクトリ構成
-./{asahi_bthesis,abstract,src,lib_inf}
-/lib
-Rのライブラリ情報.
-$R --versionと$Rscript -e 'library()'の結果
-/asahi_bthesis
-卒論のソース+pdf
-/abstract
-300字概要+概要図
-/src
-ソースコード.未完成.3/7までに完成版をアップします.
+srcの大半はpythonで書かれていて、コピュラのコアの部分だけrのライブラリを使っています
 
 #環境構築
----python--------
-$pyenv install anaconda_xxx(version xxxをインストール)
-$python --version(私の)
->Python 3.6.0 :: Anaconda 4.3.1 (x86_64))
-$pip install module_xxx(足りないmoduleをインストール)
-手動で追加したのは以下
-docopt,pyper
+@python
+１．ここ(https://www.continuum.io/downloads)からOSに合わせてダウンロードしてください。
+２. 基本的に殆どのモジュールがデフォルトでanacondaに同梱されていますが、
+    いくつかのモジュールは手動でpip installする必要があります。
+    以下のコマンドを入力してください。
+    pip install pyper
+    pip install docopt
 
-----R------
+    ※手動で入れたモジュールはこれだけだったと思いますが、もし実行して動かないようでしたら、
+    　申し訳ないですが、エラーが出たモジュール名で pip install ’モジュール名’してみてください。
+
+@R
 1. rのダウンロード https://www.r-project.org/
 2. CRANからコピュラのライブラリをダウンロード　https://cran.r-project.org/web/packages/copula/index.html
-$Rscript -e 'l
 
----svm----
-svm_rankのビルド
-./src/svm_rank下で
+
+@svmRankのビルド
+src/svmRank下で
     make
 を実行
 
+#できること 
+
+1.データセット+推薦手法を指定すると四分交差で推薦テストをする．提案手法はコピュラという確率モデルを用いた協調フィルタリング. テスト結果(評価指標はiP,precision,nDCG)をcsvで保存する． 
+
+2.csvのテスト結果からmatplotlibによる比較用のプロット画像やtexのテーブルフォーマットの出力をする．
+
+#ディレクトリ構成 
+abstract/,src/,disc/,cont/,ids.txt,lib_inf
+@lib_inf
+Rのライブラリリスト.環境構築で参照されたし.
+
+@ids.txt
+割り振るクラスタリングIDを100個保持.
+このファイルからクラスタリングIDを指定して実験を行う．
+defaultでは1行目のIDが使用されるがコマンドで行番号を指定可能(__init__.py参照)
+指定したクラスタリングIDが割り振り済みであった場合はクラスタリング結果が再利用される.未使用であった場合は,クラスタリング後にその結果が対象ディレクトリに記録される．
+
+
+@abstract/ 研究概要 
+
+@src/ ソースコード. 
+ユーザは__init__.pyへコマンドを与え．__init__.pyはパースしたコマンドを基に
+他のmoduleを呼び出す.各moduleの詳細はmoduleの冒頭のコメント参照.
+
+@disc/ or cont/ 
+disc=>discontinue.離散値特徴量を含むデータセット+推薦結果. 
+cont=>continue.連続値のみのデータセット+推薦結果. 
+
+@disc/下の構成. 
+../disc/{ppl/,questionnaire/,true_data/,false_data/,all_items.json,train_data/,cluster_depend/} 
+/cluster_depend/cluster_id_x/{result/,param/,tex/,plot/,cluster_data/,ranking/} 
+/cluster_data/cluster_num/user_x_train_id.txt 
+/result/model_name/user_id.txt 
+/param/{kl-profile/,pickle/} 
+/pickle/{all_items/,weight_and_score_model_list/} 
+/all_items/model_name/mapping_id.txt 
+/weight_and_score_model_list/model_name/user_id_train_id.txt
+
+#出力結果を見る． 
+plot=>/disc/cluster_id_depend/cluster_id_201803072213_0/plot/以下最下層のファイル 
+tex=>/disc/cluster_id_depend/cluster_id_201803072213_0/tex/以下最下層のファイル 
+cluster_id_201803072213_0の部分はcluster_idに相当する.clusteringの結果はclustering_idと対応しているため 実験済みのclustering_idを指定すればそのidに対応するclustering結果が再利用される.
+
 #実行方法
-python __init__.py 引数リスト
-以降の引き継ぎ作業は 2 月中に終わらせること
-下記のデータを全てファイルサーバの該当ディレクトリ(share/manuscripts/(卒業年)/thesis) にアップロードする．
-学士論文・修士論文・博士論文の原稿データ
-研究で使用・作成したソースコードとそのマニュアル (詳細なコメントが難しい場合でも，各ファイルの役割を記載した README は作成すること)
-実験データ
-卒論・修論・博論発表スライド
-学会発表スライド全て
-300 字概要と概要図を作成する．概要の中には論文のタイトルも入れる．卒業生の研究概要を参考にする．事前に教員にチェックを依頼する．
-計算機の手続きついて教員に相談する (そのまま内部進学する学生は除く)．
+__init__.pyへ与えるコマンドはdocoptというモジュールでパースされる.
+__init__.pyの冒頭コメントアウトされてる箇所はdocoptのパース設定.
+
+@recommendataion test
+python init.py method_name *optional_listでmethod_nameによる推薦テストを開始. 例.python init.py kl kde_cv(提案手法).*optional_listは__init__.pyを参照. 
+@plot
+python init.py plot *optionla_listで推薦結果のプロットをする．結果はdisc/以降のplot/以下に出力される． 
+@for tex
+python init.py get_result_tableで*optional_listでtexの表形式の比較結果を出力.
+
