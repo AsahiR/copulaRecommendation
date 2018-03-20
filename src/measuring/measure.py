@@ -15,6 +15,7 @@ import datetime
 from typing import List, Tuple, Dict
 from marginal import marginal
 from scoring import models
+#call "do_measure()",do recommendation test and get output(csv)
 
 def inner_import():
     global share

@@ -20,6 +20,7 @@
       ndcg@30 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline
     \end{tabular}
 """
+#get output for tex table format above this
 from itertools import  chain
 from collections import OrderedDict
 from utils import util

@@ -34,6 +34,7 @@ from comparing import compare
 from utils import util
 from sharing import shared as share
 from plotting import plot
+#process all of your commands. You can command for recommendation test or output(for tex or plotting)
 
 if __name__ == '__main__':  
     util.inner_import()

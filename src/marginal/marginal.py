@@ -20,6 +20,7 @@ from scipy  import integrate
 from statistics import variance
 from typing import List, Tuple, Dict
 
+#marinal object. Gaussian,Kde,..(etc)
 #ignore deprecation warining
 warnings.filterwarnings('ignore')
 

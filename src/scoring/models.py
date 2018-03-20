@@ -16,6 +16,7 @@ import pickle
 from collections import OrderedDict
 from copula import copula
 import math
+#recommendation method object.proposal is CopulaUsingKL
 
 def inner_import():
     global share

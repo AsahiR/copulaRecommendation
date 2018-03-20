@@ -1,5 +1,4 @@
 """
-ppl exist for disc
 path tree
 ../input_type/{ppl/,questionnaire/,true_data/,false_data/,all_items.json,train_data/,cluster_depend/}
 /cluster_depend/cluster_id_x/{result/,param/,tex/,plot/,cluster_data/,ranking/}
@@ -11,6 +10,7 @@ all_items/model_name/mapping_id.txt
 weight_and_score_model_list/model_name/user_id_train_id.txt
 
 """
+#set parameter shared by others
 import numpy as np
 import pandas as pd
 from utils import util
