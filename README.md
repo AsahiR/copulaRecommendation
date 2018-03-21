@@ -87,16 +87,14 @@ cluster_id_201803072213_0の部分はcluster_idに相当する.
 
 # 環境構築
 ## python
-1. python3をOSに合わせてダウンロード.https://www.continuum.io/downloads
+1. python3をダウンロード.<https://www.continuum.io/downloads>
 1. 基本的に殆どのモジュールがデフォルトでanacondaに同梱されているがいくつかのモジュールは手動で  
-`pip install`する.   
-    pip install pyper
-    pip install docopt  
+`pip install`する.     
+`pip install pyper`   
+`pip install docopt`    
 ## R
-1. rのダウンロード https://www.r-project.org/  
-1. CRANからコピュラのライブラリをダウンロード　https://cran.r-project.org/web/packages/copula/index.html  
-
-
+1. rのダウンロード<https://www.r-project.org/>
+1. CRANからコピュラのライブラリをダウンロード<https://cran.r-project.org/web/packages/copula/index.html> 
 ## svmRankのビルド
 src/svmRank下で  
 `make`  
