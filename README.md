@@ -87,11 +87,10 @@ cluster_id_201803072213_0の部分はcluster_idに相当する.
 
 # 環境構築
 ## python
-1. ここ( https://www.continuum.io/downloads )からOSに合わせてダウンロード。
-1. 基本的に殆どのモジュールがデフォルトでanaconda  
-(Python 3.6.0 :: Anaconda 4.3.1 (x86_64))に同梱されているがいくつかのモジュールは手動で`pip install`する.   
- 
-    pip install pyper  
+1. python3をOSに合わせてダウンロード.https://www.continuum.io/downloads
+1. 基本的に殆どのモジュールがデフォルトでanacondaに同梱されているがいくつかのモジュールは手動で  
+`pip install`する.   
+    pip install pyper
     pip install docopt  
 ## R
 1. rのダウンロード https://www.r-project.org/  
