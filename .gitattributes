@@ -1,1 +1,2 @@
-./src/svm_rank/* linguist-vendored
+*.h    linguist-vendored
+*.c    linguist-vendored
